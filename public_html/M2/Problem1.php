@@ -31,7 +31,20 @@ function printOdds($arr, $arrayNumber)
     //Step 2: Print out odd number followed by comma
         //Print out only odd number array followe dby commas between each element except the last one
     
+    $arrOdd = [];
+    for ($i = 0; $i < count($arr); $i++) {
+        if ($arr[$i] % 2 == 1) {
+            array_push($arrOdd, $arr[$i]);
+        }
+    }
 
+    for ($i = 0; $i < count($arrOdd); $i++) {
+        if ((count($arrOdd) - 1) == $i) {
+            echo "$arrOdd[$i]";
+            break;
+        }
+        echo "$arrOdd[$i], ";
+    }
 
     // End Solution Edits
     echo "<br>______________________________________<br>";
