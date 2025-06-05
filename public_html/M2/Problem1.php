@@ -23,6 +23,15 @@ function printOdds($arr, $arrayNumber)
     echo "Output Array: ";
     // Start Solution Edits
 
+    //ng569 06/05/2025
+    //Step 1: Find all odd numbers.
+        //All odd numbers are even numbers +1
+        //So if element % 2 == 1 then the element is an odd number
+        //Store in another array
+    //Step 2: Print out odd number followed by comma
+        //Print out only odd number array followe dby commas between each element except the last one
+    
+
 
     // End Solution Edits
     echo "<br>______________________________________<br>";
