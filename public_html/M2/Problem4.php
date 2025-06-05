@@ -56,6 +56,20 @@ function transformText($arr, $arrayNumber) {
             $placeholderForModifiedPhrase = str_replace("  "," ",$placeholderForModifiedPhrase);
         }
 
+
+
+
+        $lenStr = strlen($placeholderForModifiedPhrase);
+        if ($lenStr >= 3) {
+            if ($lenStr == 4) {
+                $placeholderForMiddleCharacters = substr($placeholderForModifiedPhrase,1, 2);
+            } else {
+                $placeholderForMiddleCharacters = substr($placeholderForModifiedPhrase,(floor($lenStr/2)-1), 3);
+            }
+        } else {
+            $placeholderForMiddleCharacters = "Not enough characters";
+        }
+
         
         // End Solution Edits
         echo "<div>";
