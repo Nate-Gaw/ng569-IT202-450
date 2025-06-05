@@ -40,6 +40,12 @@ function transformText($arr, $arrayNumber) {
         //Step 4: Use trim function to get rid of trailing and leading spaces
         //Step 5: Loop through string replacing double spaces with single spaces until no double space can be found
         //Step 6: assign to $placeholderForModifiedPhrase
+        //-----Getting middle 3 characters-----
+        //Step 7: Find string len
+        //Step 8: if string is 3 or more, divide by 2, floor, and remove one (this gives us the starting point)
+            //If not, then return "Not enough characters"
+        //Step 8: Use substr functions to get the middle three 
+        //Step 9: assign the result to `$placeholderForMiddleCharacters`
 
         $nonAlphaChar = ["!","@","#","$","%","^","&","*","(",")"];
         $placeholderForModifiedPhrase = str_replace($nonAlphaChar,"",$text);
