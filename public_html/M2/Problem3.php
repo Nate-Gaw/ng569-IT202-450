@@ -30,6 +30,23 @@ function bePositive($arr, $arrayNumber)
     //Step 3: if pos, add to final output array. If neg, use abs function to turn positive
     //Step 4: Once element is checked, return to original data type and add to final array
 
+    $type = "";
+
+    for ($i = 0; $i < count($arr); $i++) {
+        $type = gettype($arr[$i]);
+        $std = (float) $arr[$i];
+        if ($std < 0) {
+            $std = abs($std);
+        }
+        if ($type[0] == 's') {
+            $output[$i] = "$std";
+        } else if ($type[0] == 'i') {
+            $output[$i] = (int) number_format($std, 0);
+        } else {
+            $output[$i] = $std;
+        }
+    }
+
     // End Solution Edits
     echo "<span>Output: </span>";
     printOutputWithType($output);
