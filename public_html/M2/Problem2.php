@@ -30,7 +30,9 @@ function sumValues($arr, $arrayNumber)
 
     //ng569 06/05/2025
     //Step 1: Loop over all elements and continuously add them to total using afor loop
-    
+    for ($i = 0; $i < count($arr); $i++) {
+        $total += $arr[$i];
+    }
     
     // Solve Challenge 2 here
     // Step 2: Use number_format in order to correctly format and output total
@@ -38,6 +40,8 @@ function sumValues($arr, $arrayNumber)
     // Step 4: output modifiedTotal
 
     $modifiedTotal = "?";
+
+    $modifiedTotal = number_format($total, 2);
 
     // End Solution Edits
     echo "<p>Total Raw Value: {$total}</p>";
