@@ -33,8 +33,14 @@ function transformText($arr, $arrayNumber) {
     foreach ($arr as $index => $text) {
         // Start Solution Edits
 
+        //ng569 06-05-2025
+        //Step 1: create an array that contains non-alphanumeric characters
+        //Step 2: use str_replace in order to replace any non-alphanumeric characters (converting to ascii could also work, but may be too complicated and too much extra work for this instance)
+        //Step 3: use ucwords function in order to convert the first char in every word into a capital
+        //Step 4: Use explode to separate all words into an array
+        //Step 5: Use implode to convert the array to string with spaces in between
+        //Step 6: assign to $placeholderForModifiedPhrase
         
-
         // End Solution Edits
         echo "<div>";
         printStringTransformations($index, $placeholderForModifiedPhrase, $placeholderForMiddleCharacters);
