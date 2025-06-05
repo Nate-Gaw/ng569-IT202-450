@@ -37,9 +37,19 @@ function transformText($arr, $arrayNumber) {
         //Step 1: create an array that contains non-alphanumeric characters
         //Step 2: use str_replace in order to replace any non-alphanumeric characters (converting to ascii could also work, but may be too complicated and too much extra work for this instance)
         //Step 3: use ucwords function in order to convert the first char in every word into a capital
-        //Step 4: Use explode to separate all words into an array
-        //Step 5: Use implode to convert the array to string with spaces in between
+        //Step 4: Use trim function to get rid of trailing and leading spaces
+        //Step 5: Loop through string replacing double spaces with single spaces until no double space can be found
         //Step 6: assign to $placeholderForModifiedPhrase
+
+        $nonAlphaChar = ["!","@","#","$","%","^","&","*","(",")"];
+        $placeholderForModifiedPhrase = str_replace($nonAlphaChar,"",$text);
+        $placeholderForModifiedPhrase = ucwords($placeholderForModifiedPhrase);
+        $placeholderForModifiedPhrase = trim($placeholderForModifiedPhrase);
+
+        while (strpos($placeholderForModifiedPhrase, "  ") != false) {
+            $placeholderForModifiedPhrase = str_replace("  "," ",$placeholderForModifiedPhrase);
+        }
+
         
         // End Solution Edits
         echo "<div>";
