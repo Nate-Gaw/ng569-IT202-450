@@ -24,7 +24,11 @@ function bePositive($arr, $arrayNumber)
 
     $output = array_fill(0, count($arr), null); // Initialize output array
     // Start Solution Edits
-
+    //ng569 06-05-2025
+    //Step 1: convert input into number
+    //Step 2: check if number is pos or neg
+    //Step 3: if pos, add to final output array. If neg, use abs function to turn positive
+    //Step 4: Once element is checked, return to original data type and add to final array
 
     // End Solution Edits
     echo "<span>Output: </span>";
