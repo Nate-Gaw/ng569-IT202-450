@@ -34,6 +34,7 @@ function sumValues($arr, $arrayNumber)
         $total += $arr[$i];
     }
     
+    
     // Solve Challenge 2 here
     // Step 2: Use number_format in order to correctly format and output total
     // Step 3: assign to modifiedTotal

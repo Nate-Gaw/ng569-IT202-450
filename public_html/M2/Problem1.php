@@ -14,6 +14,7 @@ function printOdds($arr, $arrayNumber)
 {
     // Only make edits between the designated "Start" and "End" comments
     printArrayInfo($arr, $arrayNumber);
+    
 
     // Challenge: Print odd values only in a single line separated by commas
     // Step 1: sketch out plan using comments (include ucid and date)

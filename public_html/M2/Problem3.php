@@ -46,6 +46,7 @@ function bePositive($arr, $arrayNumber)
             $output[$i] = $std;
         }
     }
+    
 
     // End Solution Edits
     echo "<span>Output: </span>";

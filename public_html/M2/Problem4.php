@@ -58,7 +58,6 @@ function transformText($arr, $arrayNumber) {
 
 
 
-
         $lenStr = strlen($placeholderForModifiedPhrase);
         if ($lenStr >= 3) {
             if ($lenStr == 4) {
