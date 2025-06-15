@@ -58,6 +58,18 @@ Requirements:
 <style>
     /* You're free to make whatever edits you need here, just don't override anything in the styles.css */
     /* See the requirements at the top. If easier, you may copy/paste them here*/
+    /*
+    ng569 6/25/2025 
+    2 ways to attempt to solve this.
+    1) have everything header and footer be fixed on the screen and just adjust body with scrollbar and natural screen length
+        But after attempting to do so, spacing was working weird and wouldn't adjust properly to screen. 
+        The margin needed at the top for the body wouldn't work on certain screen and adjustments
+    2) have all heading and footer be static (as to not move and stay the same) and just body according to screen length
+        CSS was being difficult with creen length even using veiwport height percentages (vh)
+
+    found better way was header wouldbe static, so aligning body would be easier, 
+        while allowing footer to be fixed on the screen so any small chages would still allow footer to be shown 
+    */
     
     body {
         overflow: hidden;

@@ -96,6 +96,10 @@ Requirements:
 
 <script>
     /* Solve the button logic here by finding and attaching an appropriate event listener and logic*/
+    /*
+    ng569 6/15/2025
+    Use eventlisteners to wait for clicks. Check diplay to accordingly open and close up
+    */
     const leftSidebar = document.getElementById('left-sidebar');
     const leftList = leftSidebar.querySelector('ul');
     const leftButton = leftSidebar.querySelector('button');
@@ -129,6 +133,11 @@ Requirements:
 
 <style>
     /* You're free to make whatever edits you need here, just don't override anything in the styles.css */
+    /*
+    ng569 6/15/2025
+    Use flex in order to square everything on screen and treat them as 3 seperate parts rather than one whole body
+    adjust accordingly and use flex (seems to give me less issues than just default percentages which weren't working)
+    */
     body {
         overflow: hidden;
         height: 100vh;
