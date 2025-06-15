@@ -36,7 +36,7 @@ Requirements:
         </ul>
     </nav>
     <!-- Edit your UCID here -->
-    <header>Header Section (mt85)</header>
+    <header>Header Section (ng569)</header>
     <!-- Don't make any other edits to the HTML -->
     <div class="container">
         <aside id="left-sidebar">
@@ -96,8 +96,66 @@ Requirements:
 
 <script>
     /* Solve the button logic here by finding and attaching an appropriate event listener and logic*/
+    const leftSidebar = document.getElementById('left-sidebar');
+    const leftList = leftSidebar.querySelector('ul');
+    const leftButton = leftSidebar.querySelector('button');
+
+    const rightSidebar = document.getElementById('right-sidebar');
+    const rightList = rightSidebar.querySelector('ul');
+    const rightButton = rightSidebar.querySelector('button');
+
+    leftButton.addEventListener('click', function() {
+        if (leftList.style.display === "none") {
+            leftList.style.display = "block";
+            leftSidebar.style.flex = "0 0 15%";
+        } else {
+            leftList.style.display = "none";
+            leftSidebar.style.flex = "0 0 0%";
+            leftButton.style.display = "block";
+        }
+    });
+
+    rightButton.addEventListener('click', function() {
+        if (rightList.style.display === "none") {
+            rightList.style.display = "block";
+            rightSidebar.style.flex = "0 0 15%";
+        } else {
+            rightList.style.display = "none";
+            rightSidebar.style.flex = "0 0 0%";
+            rightButton.style.display = "block";
+        }
+    });
 </script>
 
 <style>
     /* You're free to make whatever edits you need here, just don't override anything in the styles.css */
+    body {
+        overflow: hidden;
+        height: 100vh;
+    }
+    nav {
+        height: 2vh;
+    }
+    header {
+        height: 3vh;
+    }
+    .container {
+        display: flex;
+        height: 92vh;
+        
+    }
+    
+    #right-sidebar, #left-sidebar {
+        flex: 0 0 15%;
+    }
+    button {
+        width: 100%;
+    }
+    .content {
+        overflow: scroll;
+        overflow-x: hidden;
+    }
+    .content > p, .content > h2, .content > section > h3, .content li {
+        margin: 20px;
+    }
 </style>
