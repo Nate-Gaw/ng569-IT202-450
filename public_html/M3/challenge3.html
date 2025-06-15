@@ -61,12 +61,17 @@ Requirements:
     create a function to update carousel text
     create an index to figure out panel number and use it to adjust distance of text
     hide other text off screen
+
+    ec:
+    check for mousedown and mouse up. If the user has mousedown within the carousel and moves in the x direction, move the panel accordingly
     */
     const prev = document.querySelector("nav button:first-child");
     const next = document.querySelector("nav button:last-child");
     const container = document.querySelector(".carousel-container");
     const panels = container.querySelectorAll(".panel");
     let panel = 0;
+    let dragging = false;
+    let xPos = 0;
 
     function showSlide() {
         let panelPer = -panel*20;
@@ -76,7 +81,7 @@ Requirements:
     prev.addEventListener('click', function() {
         panel--;
         if (panel < 0) {
-            panel = panels.length;
+            panel = panels.length - 1;
         }
         showSlide();
     })
@@ -89,6 +94,33 @@ Requirements:
         showSlide();
     })
 
+    container.addEventListener('mousedown', function(e) {
+        dragging = true;
+        xPos = e.clientX;
+    })
+
+    window.addEventListener('mousemove', function(e) {
+        if (dragging) {
+            if ((e.clientX - xPos) > 50) {
+                panel++;
+                if (panel > panels.length - 1) {
+                    panel = 0;
+                }
+                xPos = e.clientX;
+            } else if ((e.clientX - xPos) < -50) {
+                panel--;
+                if (panel < 0) {
+                    panel = panels.length - 1;
+                }
+                xPos = e.clientX;
+            }
+        }
+        showSlide();
+    })
+
+    window.addEventListener('mouseup', function(e) {
+        dragging = false;
+    })
 </script>
 
 <style>
