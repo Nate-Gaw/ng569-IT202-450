@@ -112,10 +112,11 @@ Requirements:
         if (leftList.style.display === "none") {
             leftList.style.display = "block";
             leftSidebar.style.flex = "0 0 15%";
+            leftButton.style.width = "15%";
         } else {
             leftList.style.display = "none";
             leftSidebar.style.flex = "0 0 0%";
-            leftButton.style.display = "block";
+            leftButton.style.width = "1%";
         }
     });
 
@@ -123,10 +124,11 @@ Requirements:
         if (rightList.style.display === "none") {
             rightList.style.display = "block";
             rightSidebar.style.flex = "0 0 15%";
+            rightButton.style.width = "15%";
         } else {
             rightList.style.display = "none";
             rightSidebar.style.flex = "0 0 0%";
-            rightButton.style.display = "block";
+            rightButton.style.width = "1%";
         }
     });
 </script>
@@ -156,9 +158,18 @@ Requirements:
     
     #right-sidebar, #left-sidebar {
         flex: 0 0 15%;
+        overflow: visible;
+        position: static;
     }
     button {
-        width: 100%;
+        width: 15%;
+        position: fixed;
+    }
+    #right-sidebar button {
+        right: 0;
+    }
+    #left-sidebar button {
+        left: 0;
     }
     .content {
         overflow: scroll;
@@ -166,5 +177,8 @@ Requirements:
     }
     .content > p, .content > h2, .content > section > h3, .content li {
         margin: 20px;
+    }
+    .container ul {
+        margin-top: 30px;
     }
 </style>
