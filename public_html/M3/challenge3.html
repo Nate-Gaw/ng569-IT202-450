@@ -1,0 +1,161 @@
+<!--
+Challenge 3: Carousel Layout with Swiping
+-----------------------------------------
+Requirements:
+    Using CSS adjust the layout per the following rules
+    1. Header should be at the top
+    2. Carousel should take up full width
+    3. Buttons should be centered
+    Using JavaScript solve the following
+    1. Attach appropriate event listeners to each button
+    2. Cycle through each panel showing only 1 at a time
+    3. Ensure that the panels loop when reaching the last or first one
+    4. Extra credit: Allow mouse swipe on the carousel to cycle through the panels similar to how the buttons would work 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carousel UI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="challenge3">
+    <nav>
+        <ul>
+            <li><a href="challenge1.html">Challenge 1</a></li>
+            <li><a href="challenge2.html" >Challenge 2</a></li>
+            <li><a href="challenge3.html" class="active">Challenge 3</a></li>
+        </ul>
+    </nav>
+    <!-- Edit your UCID here -->
+    <header>Header Section (ng569)</header>
+    <!-- Don't make any other edits to the HTML -->
+    <nav>
+        <button>Previous</button>
+        <button>Next</button>
+    </nav>
+
+    <div class="carousel">
+        <div class="carousel-container">
+            <div class="panel">Panel 1: HTML Forms</div>
+            <div class="panel">Panel 2: CSS Grid</div>
+            <div class="panel">Panel 3: JavaScript Events</div>
+            <div class="panel">Panel 4: Responsive Design</div>
+            <div class="panel">Panel 5: Accessibility Best Practices</div>
+        </div>
+    </div>
+</body>
+
+</html>
+<script src="util.js"></script>
+
+<script>
+    /* Solve the button logic here by finding and attaching an appropriate event listener and logic*/
+    /*
+    ng569 6/25/2025
+    use eventlisteners for previous and next button clicks
+    create a function to update carousel text
+    create an index to figure out panel number and use it to adjust distance of text
+    hide other text off screen
+
+    ec:
+    check for mousedown and mouse up. If the user has mousedown within the carousel and moves in the x direction, move the panel accordingly
+    */
+    const prev = document.querySelector("nav button:first-child");
+    const next = document.querySelector("nav button:last-child");
+    const container = document.querySelector(".carousel-container");
+    const panels = container.querySelectorAll(".panel");
+    let panel = 0;
+    let dragging = false;
+    let xPos = 0;
+
+    function showSlide() {
+        let panelPer = -panel*20;
+        container.style.transform = "translateX(" + panelPer + "%)";
+    }
+
+    prev.addEventListener('click', function() {
+        panel--;
+        if (panel < 0) {
+            panel = panels.length - 1;
+        }
+        showSlide();
+    })
+
+    next.addEventListener('click', function() {
+        panel++;
+        if (panel > panels.length - 1) {
+            panel = 0;
+        }
+        showSlide();
+    })
+
+    container.addEventListener('mousedown', function(e) {
+        dragging = true;
+        xPos = e.clientX;
+    })
+
+    window.addEventListener('mousemove', function(e) {
+        if (dragging) {
+            if ((e.clientX - xPos) > 50) {
+                panel++;
+                if (panel > panels.length - 1) {
+                    panel = 0;
+                }
+                xPos = e.clientX;
+            } else if ((e.clientX - xPos) < -50) {
+                panel--;
+                if (panel < 0) {
+                    panel = panels.length - 1;
+                }
+                xPos = e.clientX;
+            }
+        }
+        showSlide();
+    })
+
+    window.addEventListener('mouseup', function(e) {
+        dragging = false;
+    })
+</script>
+
+<style>
+    /* You're free to make whatever edits you need here, just don't override anything in the styles.css */
+    /*
+    ng569 6/25/2025
+    Adjust previous and next buttons to be centered as well as bigger to look prettier. Also bring down the gray heading to create a small gap like in the video
+    align carousel to be full width adn center text within it
+    */
+
+    header {
+        margin-bottom: 2.5vh;
+    }
+
+    nav {
+        text-align: center;
+    }
+
+    .carousel {
+        margin-top: 2.5vh;
+        width: 100%;
+        overflow: visible;
+        position: relative;
+    }
+
+    .carousel-container {
+        display: flex;
+        width: 500%;
+    }
+
+    .panel {
+        flex: 0 0 20%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50vh;
+    }
+</style>
