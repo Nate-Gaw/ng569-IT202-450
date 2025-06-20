@@ -63,6 +63,8 @@ if (isset($_POST["email"], $_POST["password"])) {
                     unset($user["password"]);
                     if (password_verify($password, $hash)) {
                         echo "Welcome, $email!<br>";
+                        $_SESSION["user"] = $user;
+                        die(header("Location: landing.php"));
                     } else {
                         echo "Invalid password<br>";
                     }
