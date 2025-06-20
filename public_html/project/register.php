@@ -62,5 +62,6 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"])) {
     if (!$hasError) {
         echo "Success<br>";
     }
+    
 }
 ?>
