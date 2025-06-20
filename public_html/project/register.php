@@ -39,6 +39,13 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"])) {
         $hasError = true;
     }
 
+    // Sanitize and validate email
+    $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo "Invalid email address<br>";
+        $hasError = true;
+    }
+
     if (empty($password)) {
         echo "Password must not be empty<br>";
         $hasError = true;
@@ -62,6 +69,5 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"])) {
     if (!$hasError) {
         echo "Success<br>";
     }
-    
 }
 ?>
