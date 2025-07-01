@@ -46,11 +46,11 @@
 </style>
 <div class="jumbotron">
     <!-- TODO replace your name -->
-    <h1 class="display-4">Welcome to Nathanael's project</h1>
+    <h1 class="display-4">Welcome to Matt's project</h1>
     <!-- TODO change Date/Semester accordingly -->
     <p class="lead">This is for the Summer semester of IT202 2025</p>
     <p>
-        <a class="btn btn-primary" href="/project/register.php" class="btn btn-primary">Register</a>
-        <a class="btn btn-secondary" href="/project/login.php" class="btn btn-secondary">Login</a>
+        <a class="btn btn-primary" href="<?php echo $BASE_PATH;?>/register.php" class="btn btn-primary">Register</a>
+        <a class="btn btn-secondary" href="<?php echo $BASE_PATH;?>/login.php" class="btn btn-secondary">Login</a>
     </p>
 </div>

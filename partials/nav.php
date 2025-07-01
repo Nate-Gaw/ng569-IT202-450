@@ -1,4 +1,8 @@
 <?php
+//include functions here so we can have it on every page that uses the nav bar
+//that way we don't need to include so many other files on each page
+//nav will pull in functions and functions will pull in db
+
 // checking to see if domain has a port number attached (localhost)
 $domain = $_SERVER["HTTP_HOST"];
 if (strpos($domain, ":")) {
@@ -17,14 +21,16 @@ if ($domain != "localhost") {
     ]);
 }
 session_start();
-require(__DIR__ . "/../lib/functions.php");
+require(__DIR__."/../lib/functions.php");
 ?>
+<link rel="stylesheet" href="<?php echo $BASE_PATH; ?>/styles.css">
+<script src="<?php echo $BASE_PATH; ?>/helpers.js"></script>
 <nav>
     <ul>
-        <!-- new content below -->
-        <?php if (is_logged_in()) : ?> 
-            <li><a href="home.php">Home</a></li>
-        <?php endif; ?> 
+        <?php if (is_logged_in()) : ?>
+            <li><a href="landing.php">Landing</a></li>
+            <li><a href="profile.php">Profile</a></li>
+        <?php endif; ?>
         <?php if (!is_logged_in()) : ?>
             <li><a href="login.php">Login</a></li>
             <li><a href="register.php">Register</a></li>
