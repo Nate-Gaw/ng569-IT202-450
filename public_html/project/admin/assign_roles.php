@@ -106,7 +106,7 @@ if (isset($_POST["username"])) {
         <tr>
             <td>
                 <!-- nested table for users -->
-                <table>
+                <table id="AssignUsers">
                     <?php foreach ($users as $user) : ?>
                         <tr>
                             <td>
@@ -122,7 +122,7 @@ if (isset($_POST["username"])) {
             <td>
                 <!-- nested data for roles -->
                 <?php foreach ($active_roles as $role) : ?>
-                    <div>
+                    <div id="AssignRoles">
                         <input form="toggleForm" id="role_<?php se($role, 'id'); ?>" type="checkbox" name="roles[]" value="<?php se($role, 'id'); ?>" />
                         <label form="toggleForm" for="role_<?php se($role, 'id'); ?>"><?php se($role, "name"); ?></label>
                     </div>
