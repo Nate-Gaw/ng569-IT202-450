@@ -180,7 +180,10 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
         let con = form.confirmPassword.value;
         let isValid = true;
         //TODO add other client side validation....
-
+        if (!isValidPassword(pw)) {
+            flash("Password must be at least 8 characters", "warning");
+            isValid = false;
+        }
         //example of using flash via javascript
         //find the flash container, create a new element, appendChild
         // NOTE: we'll extract the flash code to a function later

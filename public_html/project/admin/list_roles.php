@@ -74,7 +74,7 @@ try {
                 <tr>
                     <td><?php se($role, "id"); ?></td>
                     <td><?php se($role, "name"); ?></td>
-                    <td><?php se($role, "description"); ?></td>
+                    <td class="desc"><?php se($role, "description"); ?></td>
                     <td><?php echo (se($role, "is_active", 0, false) ? "active" : "disabled"); ?></td>
                     <td>
                         <!-- nested form to handle toggling the role -->

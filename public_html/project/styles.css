@@ -53,34 +53,53 @@
 }
 /* Update the below for Milestone 1 requirements */
 nav li {
-    display: inline;
-    background-color: rebeccapurple;
+    background-color: grey;
+    border-radius: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;;
+    list-style-type: none;
+    display: flex;
+    width: 10vw;
+    justify-content: center;
+}
+
+nav ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
+    padding: 0;
+}
+
+nav {
+    padding: 3px;
+    background-color:bisque;
+    position: sticky;
+    display: flex;
+    width: 100%;
 }
 
 nav li a {
-    color: rgb(4, 179, 120);
+    color: black;
     padding: .25rem;
+    margin: 2px;
+    text-decoration: none;
 }
-nav li a:hover {
-    color: pink;
+nav li:hover {
+    background-color: lightgrey;
+    text-decoration: underline;
+    text-decoration-color: black;
 }
 
-nav::after {
-    text-align: center;
-    content: "(*Edit the hideous css)";
-    color:red;
-
-}
 label{
-    border:#212529 dashed 2px;
+    border:#212529 solid 2px;
+    padding: 5px;
     background-color: bisque;
+    color:black;
 }
 input {
-    border-radius: 25%;
+    border-radius: 10%;
     padding: .25rem;
-}
-input:hover{
-    transform: rotateZ(10deg);
 }
 form,h3 {
     display: flex;
@@ -89,10 +108,47 @@ form,h3 {
     margin-left: auto;
     margin-right: auto;
 }
+h3 {
+    color: red;
+}
+
+form div {
+    margin: 5px;
+    color:greenyellow;
+}
+
+table, td {
+    border: 1px solid black;
+}
+table {
+    display: flexbox;
+    width: 100%;
+}
+td, th {
+    padding: 10px;
+    flex: 1;
+    width: 10%;
+    height: 5vh;
+}
+th {
+    color: darkcyan;
+}
+.desc {
+    overflow-y: scroll;
+    width: auto;
+    width: 40%;
+}
+
+#AssignUsers {
+    height: 10vh;
+}
+#AssignRoles {
+    margin: 15px;
+}
 
 body {
-    background-color: rgb(0, 68, 48);
-    color: rgb(255, 19, 235);
+    background-color: darkslategray;
+    color:tomato;
 }
 input[type="submit"]:hover {
     transform: scale(1.15)
