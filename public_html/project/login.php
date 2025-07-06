@@ -17,13 +17,26 @@ require(__DIR__ . "/../../partials/nav.php");
     function validate(form) {
         //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
         //ensure it returns false for an error and true for success
-        let pw = form.newPassword.value;
         let isValid = true;
+        let pw = form.password.value;
+        let email = form.email.value;
+        if (empty(email)) {
+            flash("Email/Username must not be empty.", "danger");
+            isValid = true;
+        }
+        if (empty(pw)) {
+            flash("Password must not be empty.", "danger");
+            isValid = true;
+        }
         if (!isValidPassword(pw)) {
             flash("Password must be at least 8 characters", "warning");
             isValid = false;
         }
-        return true;
+        if (!isValidEmail(email) && !isValidUsername(email)) {
+            flash("Invalid email or username.", "danger");
+            isValid = false;
+        }
+        return isValid;
     }
 </script>
 <?php
