@@ -148,7 +148,7 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
 }
 ?>
 <h3>Profile</h3>
-<form method="POST" onsubmit="return validate(this);">
+<form method="POST" onsubmit="return validate(this);" novalidate>
     <div class="mb-3">
         <label for="email">Email</label>
         <input type="email" name="email" id="email" value="<?php se($email); ?>" />
@@ -176,21 +176,53 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
 
 <script>
     function validate(form) {
-        let pw = form.newPassword.value;
-        let con = form.confirmPassword.value;
+        let pw = form.currentPassword.value;
+        let npw = form.newPassword.value;
+        let cpw = form.confirmPassword.value;
+        let email = form.email.value;
+        let user = form.username.value;
+
         let isValid = true;
         //TODO add other client side validation....
+        if (empty(email)) {
+            flash("Email must not be empty.", "danger");
+            isValid = false;
+        }
+        if (empty(pw)) {
+            flash("Password must not be empty.", "danger");
+            isValid = false;
+        }
+        if (empty(npw)) {
+            flash("New password must not be empty.", "danger");
+            isValid = false;
+        }
+        if (!isValidUsername(user)) {
+            flash("Username must be lowercase, alphanumerical, and can only contain _ or -", "danger");
+            $hasError = true;
+        }
+        if (isValidEmail(email)) {
+            flash("Invalid email address.", "danger");
+            isValid = false;
+        }
         if (!isValidPassword(pw)) {
             flash("Password must be at least 8 characters", "warning");
+            isValid = false;
+        }
+        if (!isValidPassword(npw)) {
+            flash("New password must be at least 8 characters", "warning");
+            isValid = false;
+        }
+        if(!isValidConfirm(npw,cpw)) {
+            flash("Passwords must match.", "danger");
             isValid = false;
         }
         //example of using flash via javascript
         //find the flash container, create a new element, appendChild
         // NOTE: we'll extract the flash code to a function later
-        if (pw !== con) { // first JS validation example
-            flash("Password and Confirm password must match", "warning");
-            isValid = false;
-        }
+        // if (pw !== con) { // first JS validation example
+        //     flash("Password and Confirm password must match", "warning");
+        //     isValid = false;
+        // }
         // returning false will prevent the form from submitting
         return isValid;
     }

@@ -25,13 +25,36 @@ require(__DIR__ . "/../../partials/nav.php");
     function validate(form) {
         //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
         //ensure it returns false for an error and true for success
-        let pw = form.newPassword.value;
+        let pw = form.pw.value;
+        let com = form.confirm.value;
+        let user = form.username.value;
+        let email = form.email.value;
         let isValid = true;
+        if (empty(email)) {
+            flash("Email/Username must not be empty.", "danger");
+            isValid = false;
+        }
+        if (empty(pw)) {
+            flash("Password must not be empty.", "danger");
+            isValid = false;
+        }
         if (!isValidPassword(pw)) {
             flash("Password must be at least 8 characters", "warning");
             isValid = false;
         }
-        return true;
+        if (!isValidEmail(email)) {
+            flash("Invalid email address.", "danger");
+            isValid = false;
+        }
+        if (!isValidUsername(user)) {
+            flash("Username must be lowercase, alphanumerical, and can only contain _ or -", "danger");
+            isValid = false;
+        }
+        if(!isValidConfirm(pw,com)) {
+            flash("Passwords must match.", "danger");
+            isValid = false;
+        }
+        return isValid;
     }
 </script>
 <?php
@@ -87,13 +110,12 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["userna
         $stmt = $db->prepare("INSERT INTO Users (email, password, username) VALUES (:email, :password, :username)");
         try {
             $stmt->execute([':email' => $email, ':password' => $hashed_password, ':username' => $username]);
-   
+
             flash("Successfully registered! You can now log in.", "success");
-        } catch(PDOException $e) {
+        } catch (PDOException $e) {
             // Handle duplicate email/username
             users_check_duplicate($e);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             flash("There was an error registering. Please try again.", "danger");
             error_log("Registration Error: " . var_export($e, true)); // log the technical error for debugging
         }
