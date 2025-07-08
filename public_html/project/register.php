@@ -3,6 +3,8 @@ require(__DIR__ . "/../../partials/nav.php");
 ?>
 <h3>Register</h3>
 <form onsubmit="return validate(this)" method="POST">
+    <!--ng569 7/7/25 
+    HTML form with email username password inputs and a comfirm button-->
     <div>
         <label for="email">Email</label>
         <input id="email" type="email" name="email" required />
@@ -25,6 +27,9 @@ require(__DIR__ . "/../../partials/nav.php");
     function validate(form) {
         //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
         //ensure it returns false for an error and true for success
+        //ng569 7/7/25 
+        //JS validation. Email and passwords are checked to see if they are empty. 
+        //Then everything is checked accordingly to see if everything is valid.
         let pw = form.pw.value;
         let com = form.confirm.value;
         let user = form.username.value;
@@ -60,6 +65,10 @@ require(__DIR__ . "/../../partials/nav.php");
 <?php
 //TODO 2: add PHP Code
 if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["username"])) {
+    //ng569 7/7/25 
+    //Everything is checked very similar to JS
+    //Then if there is no error, records are retrieved from DB to check for duplicated
+    //and entered and saved if there is no issue
 
     $email = se($_POST, "email", "", false);
     $password = se($_POST, "password", "", false);

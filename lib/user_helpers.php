@@ -1,4 +1,7 @@
 <?php
+//ng569 7/7/25 both functions below check if the user is either logged on or has the roles
+//by checking the session information, and seeing if the session is still active with a user or a user with permission
+//if not, then they will be redirected and given an alert. THe session is destroyed after every logout.
 /**
  * Check if the user is logged in and optionally redirect to $destination.
  * @param bool $redirect Whether to redirect if not logged in.
