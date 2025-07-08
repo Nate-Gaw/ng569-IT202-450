@@ -1,0 +1,158 @@
+/* Moved from flash.php*/
+/* Define basic colors for standard bootstrap alert classes, scoped to .container#flash */
+/* This will be later moved into a separate CSS file in a future lesson */
+/* And one we add bootstrap, we will use the bootstrap classes instead of these */
+
+.container#flash {
+
+    .alert {
+        padding: 1rem;
+        border-radius: 0.25rem;
+        font-size: 1rem;
+    }
+
+    .alert-primary {
+        background-color: #cfe2ff;
+        color: #084298;
+    }
+
+    .alert-secondary {
+        background-color: #e2e3e5;
+        color: #41464b;
+    }
+
+    .alert-success {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+
+    .alert-info {
+        background-color: #cff4fc;
+        color: #055160;
+    }
+
+    .alert-light {
+        background-color: #fefefe;
+        color: #636464;
+    }
+
+    .alert-dark {
+        background-color: #212529;
+        color: #fff;
+    }
+}
+/* Update the below for Milestone 1 requirements */
+nav li {
+    background-color: grey;
+    border-radius: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;;
+    list-style-type: none;
+    display: flex;
+    width: 10vw;
+    justify-content: center;
+}
+
+nav ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
+    padding: 0;
+}
+
+nav {
+    padding: 3px;
+    background-color:bisque;
+    position: sticky;
+    display: flex;
+    width: 100%;
+}
+
+nav li a {
+    color: black;
+    padding: .25rem;
+    margin: 2px;
+    text-decoration: none;
+}
+nav li:hover {
+    background-color: lightgrey;
+    text-decoration: underline;
+    text-decoration-color: black;
+}
+
+label{
+    border:#212529 solid 2px;
+    padding: 5px;
+    background-color: bisque;
+    color:black;
+}
+input {
+    border-radius: 10%;
+    padding: .25rem;
+}
+form,h3 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+h3 {
+    color: red;
+}
+
+form div {
+    margin: 5px;
+    color:greenyellow;
+}
+
+table, td {
+    border: 1px solid black;
+}
+table {
+    display: flexbox;
+    width: 100%;
+}
+td, th {
+    padding: 10px;
+    flex: 1;
+    width: 10%;
+    height: 5vh;
+}
+th {
+    color: darkcyan;
+}
+.desc {
+    overflow-y: scroll;
+    width: auto;
+    width: 40%;
+}
+
+#AssignUsers {
+    height: 10vh;
+}
+#AssignRoles {
+    margin: 15px;
+}
+
+body {
+    background-color: darkslategray;
+    color:tomato;
+}
+input[type="submit"]:hover {
+    transform: scale(1.15)
+}
+input[type="submit"]:active {
+     transform: scale(.75)
+}
