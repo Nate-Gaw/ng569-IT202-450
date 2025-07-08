@@ -151,7 +151,7 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
 }
 ?>
 <h3>Profile</h3>
-<form method="POST" onsubmit="return validate(this);" novalidate>
+<form method="POST" onsubmit="return validate(this);">
     <!-- ng569 7/7/25
      HTML validation email and username are required and new and confirm password is required and has minimum length.
      The current password is required but there is no minlength just in case somehow they register or change their password without req-->
