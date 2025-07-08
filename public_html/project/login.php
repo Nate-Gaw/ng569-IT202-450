@@ -3,6 +3,8 @@ require(__DIR__ . "/../../partials/nav.php");
 ?>
 <h3>Login</h3>
 <form onsubmit="return validate(this)" method="POST">
+    <!--ng569 7/725
+    HTML Form, 2 inputs 1 for email/username and password and 1 button to submit the form-->
     <div>
         <label for="email">Email or Username</label>
         <input id="email" type="text" name="email" required />
@@ -17,6 +19,10 @@ require(__DIR__ . "/../../partials/nav.php");
     function validate(form) {
         //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
         //ensure it returns false for an error and true for success
+
+        //ng569 7/7/25
+        //JS Validation, checks for empty email and password then checks if the password is valid, 
+        // then checks the first input to see if its a valid email or a valid username
         let isValid = true;
         let pw = form.password.value;
         let email = form.email.value;
@@ -41,6 +47,12 @@ require(__DIR__ . "/../../partials/nav.php");
 </script>
 <?php
 //TODO 2: add PHP Code
+//ng569 7/7/25
+//email and password is gathered from the form. Then they are validated, first for being empty,
+//then the email is sanitized and checked to see if its a valid email format
+//the password is then checked to see if its a valid password.
+//if all above passes, the php then sends a request to the DB, where it retrieves files
+//and checks to see if the email and password exists and throws error if it doesn't
 if (isset($_POST["email"], $_POST["password"])) {
     // still leveraging the property as "email", but it can be a username
     $email = se($_POST, "email", "", false);

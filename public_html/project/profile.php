@@ -1,10 +1,13 @@
 <?php
+//ng569 7/7/25 redirect if user is not logged in
 require_once(__DIR__ . "/../../partials/nav.php");
 if (!is_logged_in()) {
     die(header("Location: login.php"));
 }
 ?>
 <?php
+//ng569 7/7/25 PHP Validation. It checks to make sure everything input is valid and not empty then if the new email is not the same or the new username is not the same then it calls the DB and inputs the new information
+//Then the same is done for passwords, where they are checked and then compared to the DB system, each other and saved if passed.
 $user_id = get_user_id(); // get id from session
 $email = get_user_email(); // get email from session
 $username = get_username(); // get username from session
@@ -149,32 +152,37 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
 ?>
 <h3>Profile</h3>
 <form method="POST" onsubmit="return validate(this);" novalidate>
+    <!-- ng569 7/7/25
+     HTML validation email and username are required and new and confirm password is required and has minimum length.
+     The current password is required but there is no minlength just in case somehow they register or change their password without req-->
     <div class="mb-3">
         <label for="email">Email</label>
-        <input type="email" name="email" id="email" value="<?php se($email); ?>" />
+        <input type="email" name="email" id="email" value="<?php se($email); ?>" required/>
     </div>
     <div class="mb-3">
         <label for="username">Username</label>
-        <input type="text" name="username" id="username" value="<?php se($username); ?>" />
+        <input type="text" name="username" id="username" value="<?php se($username); ?>" required maxlength="30"/>
     </div>
     <!-- DO NOT PRELOAD PASSWORD -->
     <div>Password Reset</div>
     <div class="mb-3">
         <label for="cp">Current Password</label>
-        <input type="password" name="currentPassword" id="cp" />
+        <input type="password" name="currentPassword" id="cp" required/>
     </div>
     <div class="mb-3">
         <label for="np">New Password</label>
-        <input type="password" name="newPassword" id="np" />
+        <input type="password" name="newPassword" id="np" required minlength="8"/>
     </div>
     <div class="mb-3">
         <label for="conp">Confirm Password</label>
-        <input type="password" name="confirmPassword" id="conp" />
+        <input type="password" name="confirmPassword" id="conp" required minlength="8"/>
     </div>
     <input type="submit" value="Update Profile" name="save" />
 </form>
 
 <script>
+    //ng569 7/7/25
+    //Double checks to make sure that the inputs are NOT empty and checks for valid inputs and matching passwords
     function validate(form) {
         let pw = form.currentPassword.value;
         let npw = form.newPassword.value;

@@ -14,6 +14,11 @@ function flash(message = "", color = "info") {
     //add the element to the DOM (if we don't it merely exists in memory)
     flash.appendChild(outerDiv);
 }
+
+//ng569 7/7/25 
+//JS Validation functions
+//Use simple regex to check for email and username 
+// to make sure no outside characters are used
 function isValidPassword(pass) {
     return pass?.length >= 8;
 }

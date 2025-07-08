@@ -1,5 +1,7 @@
 <?php
-
+//ng569 7/7/25
+//PHP Functions. using filter_var functions to sanitize and validate traditional email syntax
+//Then uses preg_match function to check for valid username
 function sanitize_email($email = "") {
     return filter_var(trim($email), FILTER_SANITIZE_EMAIL);
 }
@@ -19,3 +21,4 @@ function is_valid_confirm($original, $confirm)
     // checking not empty to avoid empty equals empty being true
     return !empty($original) && $original === $confirm;
 }
+
