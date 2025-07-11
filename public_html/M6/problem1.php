@@ -29,8 +29,20 @@ function processBirds($birds) {
     $subset = []; // result array
     // Start edits
     //ng569 7/10/25 
-    //loop througth the array to get each bird, then track each birds name, colo, and region and add that into the subset array
-
+    //loop througth the array to get each bird, then track each birds name, color, and region and add that into the subset array
+    $temp = [];
+    for ($i = 0; $i < sizeof($birds); $i++) {
+        if($birds[$i]["name"] != NULL) {
+            $temp["name"] = $birds[$i]["name"];
+        }
+        if($birds[$i]["color"] != NULL) {
+            $temp["color"] = $birds[$i]["color"];
+        }
+        if($birds[$i]["region"] != NULL) {
+            $temp["region"] = $birds[$i]["region"];
+        }
+        array_push($subset,$temp);
+    }
 
     // End edits
     echo "<pre>" . var_export($subset, true) . "</pre>";
