@@ -33,7 +33,23 @@ function processCars($cars) {
     //ng569 7/10/25 
     //Have a loop run through the cars variable and copy everything initially in the array. Then add in the age by taking $current_year - [year] to get the age. 
     //Then using logic to compare the age to the classica age to see if the age of the car is greater.
-   
+    $carAge = 0;
+    $temp = [];
+    $is_classic = false;
+    for ($i = 0; $i < sizeof($cars); $i++) {
+        foreach($cars[$i] as $title => $info) {
+            if (strcmp($title, "year") == 0) {
+                $carAge = $currentYear - intval($info);
+                if ($carAge >= $classic_age) {
+                    $is_classic = true;
+                }
+            }
+            $temp[$title] = $info;
+        }
+        $temp["age"] = $carAge;
+        $temp["is_classic"] = $is_classic;
+        array_push($processedCars, $temp);
+    }
     // End edits
     echo "<pre>" . var_export($processedCars, true) . "</pre>";
     
