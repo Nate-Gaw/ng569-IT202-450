@@ -160,3 +160,17 @@ function search_companies($search){
     }
     return $transformedResult;
 }
+function uppercaseSymbolCurrency($data)
+{
+    if (!is_array($data)) {
+        throw new InvalidArgumentException('$data must be an array');
+    }
+    foreach ($data as $i => $obj) {
+        foreach ($obj as $k => $v) {
+            if (in_array($k, ["symbol", "currency"])) {
+                $data[$i][$k] = strtoupper($v);
+            }
+        }
+    }
+    return $data;
+}

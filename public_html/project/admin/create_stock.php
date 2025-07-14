@@ -42,26 +42,21 @@ if (isset($_POST["action"])) {
     }
     //insert data - Below should only really need the table name changes
     // the query building should work for all regular inserts
-    $db = getDB();
-    $query = "INSERT INTO `IT202-M25-Stocks` ";
-    $columns = [];
-    $params = [];
-    //per record
-    foreach ($quote as $k => $v) {
-        array_push($columns, "`$k`");
-        $params[":$k"] = $v;
-    }
-    $query .= "(" . join(",", $columns) . ")";
-    $query .= "VALUES (" . join(",", array_keys($params)) . ")";
-    error_log("Query: " . $query);
-    error_log("Params: " . var_export($params, true));
     try {
-        $stmt = $db->prepare($query);
-        $stmt->execute($params);
-        flash("Inserted record " . $db->lastInsertId(), "success");
+        $quote = uppercaseSymbolCurrency([$quote])[0];
+        $r = insert("IT202-M25-Stocks", $quote, ["update_duplicate"=>true]);
+        if ($r["lastInsertId"]) {
+            flash("Inserted record " . $r["lastInsertId"], "success");
+        } else {
+            flash("Error inserting record", "warning");
+        }
     } catch (PDOException $e) {
         error_log("Something broke with the query" . var_export($e, true));
         flash("An error occurred", "danger");
+    }
+    catch(Exception $e) {
+        error_log("Something broke with the query" . var_export($e, true));
+        flash("An error occurred: " . $e->getMessage(), "danger");
     }
 }
 
