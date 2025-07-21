@@ -23,6 +23,7 @@ function isValidPassword(pass) {
     return pass?.length >= 8;
 }
 function isValidEmail(pass) {
+    pass = pass.trim();
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(pass);
 }
 function isValidUsername(pass) {

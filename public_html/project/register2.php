@@ -1,5 +1,7 @@
 <?php
 require(__DIR__ . "/../../partials/nav.php");
+
+// represent form as data
 $form = [
     ["type" => "email", "id" => "email", "name" => "email", "label" => "Email", "rules" => ["required" => true]],
     [
@@ -28,38 +30,12 @@ $form = [
 </div>
 <script>
     function validate(form) {
-        //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
+        //TODO 1: implement JavaScript validation
         //ensure it returns false for an error and true for success
-        //ng569 7/7/25 
-        //JS validation. Email and passwords are checked to see if they are empty. 
-        //Then everything is checked accordingly to see if everything is valid.
-        let pw = form.pw.value;
-        let com = form.confirm.value;
-        let user = form.username.value;
-        let email = form.email.value;
+        let pw = form.password.value;
         let isValid = true;
-        if (empty(email)) {
-            flash("Email/Username must not be empty.", "danger");
-            isValid = false;
-        }
-        if (empty(pw)) {
-            flash("Password must not be empty.", "danger");
-            isValid = false;
-        }
-        if (!isValidPassword(pw)) {
+        if(!isValidPassword(pw)){
             flash("Password must be at least 8 characters", "warning");
-            isValid = false;
-        }
-        if (!isValidEmail(email)) {
-            flash("Invalid email address.", "danger");
-            isValid = false;
-        }
-        if (!isValidUsername(user)) {
-            flash("Username must be lowercase, alphanumerical, and can only contain _ or -", "danger");
-            isValid = false;
-        }
-        if(!isValidConfirm(pw,com)) {
-            flash("Passwords must match.", "danger");
             isValid = false;
         }
         return isValid;
@@ -68,10 +44,6 @@ $form = [
 <?php
 //TODO 2: add PHP Code
 if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["username"])) {
-    //ng569 7/7/25 
-    //Everything is checked very similar to JS
-    //Then if there is no error, records are retrieved from DB to check for duplicated
-    //and entered and saved if there is no issue
 
     $email = se($_POST, "email", "", false);
     $password = se($_POST, "password", "", false);
@@ -81,35 +53,41 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["userna
     $hasError = false;
 
     if (empty($email)) {
+        //echo "Email must not be empty<br>";
         flash("Email must not be empty.", "danger");
         $hasError = true;
     }
     // Sanitize and validate email
     $email = sanitize_email($email);
     if (!is_valid_email($email)) {
+        //echo "Invalid email address<br>";
         flash("Invalid email address.", "danger");
         $hasError = true;
     }
     if (!is_valid_username($username)) {
-        flash("Username must be lowercase, alphanumerical, and can only contain _ or -", "danger");
+        flash("Username must be lowercase, alphanumerical, can only contain _ or -, and be between 3 to 30 characters", "danger");
         $hasError = true;
     }
     if (empty($password)) {
+        //echo "Password must not be empty<br>";
         flash("Password must not be empty.", "danger");
         $hasError = true;
     }
 
     if (empty($confirm)) {
+        //echo "Confirm password must not be empty<br>";
         flash("Confirm password must not be empty.", "danger");
         $hasError = true;
     }
 
     if (!is_valid_password($password)) {
+        //echo "Password too short<br>";
         flash("Password must be at least 8 characters long.", "danger");
         $hasError = true;
     }
 
     if (!is_valid_confirm($password, $confirm)) {
+        //echo "Passwords must match<br>";
         flash("Passwords must match.", "danger");
         $hasError = true;
     }
@@ -122,12 +100,14 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["userna
         $stmt = $db->prepare("INSERT INTO Users (email, password, username) VALUES (:email, :password, :username)");
         try {
             $stmt->execute([':email' => $email, ':password' => $hashed_password, ':username' => $username]);
-
+            //echo "Successfully registered!<br>";
             flash("Successfully registered! You can now log in.", "success");
-        } catch (PDOException $e) {
-            // Handle duplicate email/username
-            users_check_duplicate($e);
-        } catch (Exception $e) {
+        } 
+        catch(PDOException $e){
+             users_check_duplicate($e);
+        }
+        catch (Exception $e) {
+            //echo "There was an error registering<br>"; // user-friendly message
             flash("There was an error registering. Please try again.", "danger");
             error_log("Registration Error: " . var_export($e, true)); // log the technical error for debugging
         }
