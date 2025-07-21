@@ -208,7 +208,7 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
             flash("Username must be lowercase, alphanumerical, and can only contain _ or -", "danger");
             $hasError = true;
         }
-        if (isValidEmail(email)) {
+        if (!isValidEmail(email)) {
             flash("Invalid email address.", "danger");
             isValid = false;
         }
