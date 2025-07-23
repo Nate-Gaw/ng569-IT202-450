@@ -152,29 +152,64 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
 //handle location update
 if (isset($_POST["location"])) {
     $location = se($_POST, "location", null, false);
-    $can_update = !empty($location);
+    $can_update = !empty($location) && $location != get_user_loc();
     if ($can_update) {
-        if (preg_match('/^[A-Za-z\s]+$/', $location)) {
-            try {
-                $db = getDB();
-                $query = "UPDATE Users set location = :location where id = :id";
-                $stmt = $db->prepare($query);
-                $stmt->execute([
-                    ":id" => get_user_id(),
-                    ":location" => $location
-                ]);
-                $updated_rows = $stmt->rowCount();
-                if ($updated_rows === 0) {
-                    flash("No changes made to password", "warning");
-                } else if ($updated_rows == 1) {
-                    flash("Location updated successfully", "success");
-                } else {
-                    // this shouldn't happen, but we log it just in case
-                    error_log("Unexpected number of rows updated for location change: " . $updated_rows);
+        if (preg_match('/^[A-Za-z\s\/\_]+$/', $location)) {
+
+            $data = ["location" => $location];
+            $endpoint = "https://world-time-by-based-api.p.rapidapi.com/v1/worldtime/";
+            $isRapidAPI = true;
+            $rapidAPIHost = "world-time-by-based-api.p.rapidapi.com";
+            $result = get($endpoint, "TIME_API_KEY", $data, $isRapidAPI, $rapidAPIHost);
+            //example of cached data to save the quotas, don't forget to comment out the get() if using the cached data for testing
+           /*$result = ["status" => 200, "response" => '{
+                "datetime":"2025-07-14 99:99:99",
+                "timezone_name":"Eastern Daylight Time",
+                "timezone_location":"America/New_York",
+                "timezone_abbreviation":"EDT",
+                "gmt_offset":-4,
+                "is_dst":true,
+                "requested_location":"New York",
+                "latitude":40.7127281,
+                "longitude":-74.0060152
+            }'];*/
+
+            error_log("Response: " . var_export($result, true));
+            if (se($result, "status", 400, false) == 200 && isset($result["response"])) {
+                $result = json_decode($result["response"], true);
+            } else {
+                $result = [];
+            }
+
+            if (count($result) > 0) {
+                try {
+                    $db = getDB();
+                    $query = "UPDATE Users SET location = :location, tz_name = :tz_name, tz_loc = :tz_loc, tz_abb = :tz_abb, gmt = :gmt WHERE id = :id";
+                    $stmt = $db->prepare($query);
+                    $stmt->execute([
+                        ":id" => get_user_id(),
+                        ":location" => $location,
+                        ":tz_name" => se($result, "timezone_name", null, false),
+                        ":tz_loc" => se($result, "timezone_location", null, false),
+                        ":tz_abb" => se($result, "timezone_abbreviation", null, false),
+                        ":gmt" => se($result, "gmt_offset", null, false),
+                    ]);
+                    $updated_rows = $stmt->rowCount();
+                    if ($updated_rows === 0) {
+                        flash("No changes made to password", "warning");
+                    } else if ($updated_rows == 1) {
+                        flash("Location updated successfully", "success");
+                        update_user_info(se($result, "timezone_location", null, false), (int) se($result, "gmt_offset", null, false));
+                    } else {
+                        // this shouldn't happen, but we log it just in case
+                        error_log("Unexpected number of rows updated for location change: " . $updated_rows);
+                    }
+                } catch (Exception $e) {
+                    flash("Error processing location change", "danger");
+                    error_log("Error processing location change: " . var_export($e, true));
                 }
-            } catch (Exception $e) {
-                flash("Error processing location change", "danger");
-                error_log("Error processing location change: " . var_export($e, true));
+            } else {
+                flash("Location is invalid, please try again.", "danger");
             }
         } else {
             error_log("Location is invalid", "danger");
@@ -213,7 +248,7 @@ if (isset($_POST["location"])) {
     <div>Change Location:</div>
     <div class="mb-3">
         <label for="cp">Location</label>
-        <input type="text" pattern="^[A-Za-z\s]+$" value = <?php echo get_user_loc(); ?> title="Letters Only" name="location" id="loc" />
+        <input type="text" pattern="^[A-Za-z\s\/\_]+$" value=<?php echo get_user_loc(); ?> title="Letters Only" name="location" id="loc" />
     </div>
     <br>
     <input type="submit" value="Update Profile" name="save" />

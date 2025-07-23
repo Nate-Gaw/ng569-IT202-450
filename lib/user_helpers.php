@@ -73,3 +73,20 @@ function get_user_gmt() {
     }
     return -1;
 }
+/**
+ * Update users location and gmt
+ * @param string $location Enter users latest location
+ * @param int $gmt Enter users lastest gmt
+ */
+function update_user_info($location, $gmt) {
+    if (is_logged_in()) {
+        update_user_loc($location);
+        update_user_gmt($gmt);
+    }
+}
+function update_user_loc($location) {
+    $_SESSION["user"]["tz_loc"] = $location;
+}
+function update_user_gmt($gmt) {
+    $_SESSION["user"]["gmt"] = $gmt;
+}
