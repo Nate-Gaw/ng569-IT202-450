@@ -17,7 +17,7 @@ if (!is_logged_in()) {
         $stmt = $db->prepare(
             "SELECT r.name FROM UserRoles AS ur 
                 JOIN Roles AS r ON ur.role_id = r.id
-                WHERE ur.user_id = :id AND ur.is_active = 1;"
+                WHERE ur.user_id = :id AND r.is_active = 1;"
         );
         try {
             $stmt->execute([":id" => $id]);
