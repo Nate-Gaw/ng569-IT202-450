@@ -97,7 +97,7 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
     $can_update = !empty($current_password) && !empty($new_password) && !empty($confirm_password);
     if ($can_update) {
         // check that new matches confirm (i.e., no typos)
-        if (!is_valid_confirm($new_password,$confirm_password)) {
+        if (!is_valid_confirm($new_password, $confirm_password)) {
             flash("New passwords don't match", "warning");
         } else {
             //validate current password against password rules
@@ -149,7 +149,40 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
         }
     }
 }
+//handle location update
+if (isset($_POST["location"])) {
+    $location = se($_POST, "location", null, false);
+    $can_update = !empty($location);
+    if ($can_update) {
+        if (preg_match('/^[A-Za-z\s]+$/', $location)) {
+            try {
+                $db = getDB();
+                $query = "UPDATE Users set location = :location where id = :id";
+                $stmt = $db->prepare($query);
+                $stmt->execute([
+                    ":id" => get_user_id(),
+                    ":location" => $location
+                ]);
+                $updated_rows = $stmt->rowCount();
+                if ($updated_rows === 0) {
+                    flash("No changes made to password", "warning");
+                } else if ($updated_rows == 1) {
+                    flash("Location updated successfully", "success");
+                } else {
+                    // this shouldn't happen, but we log it just in case
+                    error_log("Unexpected number of rows updated for location change: " . $updated_rows);
+                }
+            } catch (Exception $e) {
+                flash("Error processing location change", "danger");
+                error_log("Error processing location change: " . var_export($e, true));
+            }
+        } else {
+            error_log("Location is invalid", "danger");
+        }
+    }
+}
 ?>
+
 <h3>Profile</h3>
 <form method="POST" onsubmit="return validate(this);">
     <!-- ng569 7/7/25
@@ -157,26 +190,32 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
      The current password is required but there is no minlength just in case somehow they register or change their password without req-->
     <div class="mb-3">
         <label for="email">Email</label>
-        <input type="email" name="email" id="email" value="<?php se($email); ?>" required/>
+        <input type="email" name="email" id="email" value="<?php se($email); ?>" required />
     </div>
     <div class="mb-3">
         <label for="username">Username</label>
-        <input type="text" name="username" id="username" value="<?php se($username); ?>" required maxlength="30"/>
+        <input type="text" name="username" id="username" value="<?php se($username); ?>" required maxlength="30" />
     </div>
     <!-- DO NOT PRELOAD PASSWORD -->
-    <div>Password Reset</div>
+    <div>Password Reset:</div>
     <div class="mb-3">
         <label for="cp">Current Password</label>
-        <input type="password" name="currentPassword" id="cp" required/>
+        <input type="password" name="currentPassword" id="cp" />
     </div>
     <div class="mb-3">
         <label for="np">New Password</label>
-        <input type="password" name="newPassword" id="np" required minlength="8"/>
+        <input type="password" name="newPassword" id="np" minlength="8" />
     </div>
     <div class="mb-3">
         <label for="conp">Confirm Password</label>
-        <input type="password" name="confirmPassword" id="conp" required minlength="8"/>
+        <input type="password" name="confirmPassword" id="conp" minlength="8" />
     </div>
+    <div>Change Location:</div>
+    <div class="mb-3">
+        <label for="cp">Location</label>
+        <input type="text" pattern="^[A-Za-z\s]+$" value = <?php echo get_user_loc(); ?> title="Letters Only" name="location" id="loc" />
+    </div>
+    <br>
     <input type="submit" value="Update Profile" name="save" />
 </form>
 
@@ -189,21 +228,41 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
         let cpw = form.confirmPassword.value;
         let email = form.email.value;
         let user = form.username.value;
+        let loc = form.location.value;
 
         let isValid = true;
+        let emptyPass = false;
+        let emptyLoc = false;
         //TODO add other client side validation....
         if (empty(email)) {
             flash("Email must not be empty.", "danger");
             isValid = false;
         }
-        if (empty(pw)) {
-            flash("Password must not be empty.", "danger");
-            isValid = false;
+        if (!empty(pw) || !empty(npw) || !empty(cpw)) {
+            if (empty(pw)) {
+                flash("Password must not be empty.", "danger");
+                isValid = false;
+            }
+            if (empty(npw)) {
+                flash("New password must not be empty.", "danger");
+                isValid = false;
+            }
+            if (!isValidPassword(pw)) {
+                flash("Password must be at least 8 characters", "warning");
+                isValid = false;
+            }
+            if (!isValidPassword(npw)) {
+                flash("New password must be at least 8 characters", "warning");
+                isValid = false;
+            }
+            if (!isValidConfirm(npw, cpw)) {
+                flash("Passwords must match.", "danger");
+                isValid = false;
+            }
+        } else {
+            emptyPass = true;
         }
-        if (empty(npw)) {
-            flash("New password must not be empty.", "danger");
-            isValid = false;
-        }
+
         if (!isValidUsername(user)) {
             flash("Username must be lowercase, alphanumerical, and can only contain _ or -", "danger");
             $hasError = true;
@@ -212,16 +271,11 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
             flash("Invalid email address.", "danger");
             isValid = false;
         }
-        if (!isValidPassword(pw)) {
-            flash("Password must be at least 8 characters", "warning");
-            isValid = false;
+        if (empty(loc)) {
+            emptyLoc = true;
         }
-        if (!isValidPassword(npw)) {
-            flash("New password must be at least 8 characters", "warning");
-            isValid = false;
-        }
-        if(!isValidConfirm(npw,cpw)) {
-            flash("Passwords must match.", "danger");
+        if (emptyLoc && emptyPass) {
+            flash("Nothing to update in form.", "danger");
             isValid = false;
         }
         //example of using flash via javascript

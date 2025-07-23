@@ -41,7 +41,7 @@ session_start();
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <?php if (is_logged_in()) : ?>
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="<?php echo get_url('landing.php'); ?>">Landing</a>
+                        <a class="nav-link" aria-current="page" href="<?php echo get_url('landing.php'); ?>">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" aria-current="page" href="<?php echo get_url('profile.php'); ?>">Profile</a>
@@ -72,31 +72,21 @@ session_start();
                         </ul>
                     </li>
                 <?php endif; ?>
-                <?php if (has_role("Admin")) : ?>
+                <?php if (is_logged_in()) : ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Stocks
+                            Manage Meetings
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" aria-current="page" href="<?php echo get_url('admin/create_stock.php'); ?>">Create Stock</a>
+                            <li><a class="dropdown-item" aria-current="page" href="<?php echo get_url('create_meeting.php'); ?>">Create A Meeting</a>
                             </li>
-                            <li><a class="dropdown-item" aria-current="page" href="<?php echo get_url('admin/list_stocks.php'); ?>">List Stock</a>
+                            <li><a class="dropdown-item" aria-current="page" href="<?php echo get_url('edit_meetings.php'); ?>">Edit Your Meetings</a>
                             </li>
-                        </ul>
-                    </li>
-                <?php endif; ?>
-                <?php if (has_role("Admin")) : ?>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Companies
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="<?php echo get_url('admin/create_company.php'); ?>">Create Company</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" aria-current="page" href="<?php echo get_url('admin/list_companies.php'); ?>">List Companies</a>
-                            </li>
+                            <?php if (has_role("Admin")) : ?>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" aria-current="page" href="<?php echo get_url('admin/manage_meetings.php'); ?>">Manage All Meetings</a>
+                                </li>
+                            <?php endif; ?>
                         </ul>
                     </li>
                 <?php endif; ?>

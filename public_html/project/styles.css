@@ -84,6 +84,7 @@ nav li a {
     padding: .25rem;
     margin: 2px;
     text-decoration: none;
+    text-align: center;
 }
 nav li:hover {
     background-color: lightgrey;
@@ -155,4 +156,21 @@ input[type="submit"]:hover {
 }
 input[type="submit"]:active {
      transform: scale(.75)
+}
+.dropdown-menu li {
+    border-radius: 0;
+}
+
+#landing-body {
+    margin-left: 20px;
+}
+#landing-body li {
+    margin-left: 40px;
+}
+.input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 50%;
+    align-items: stretch;
 }

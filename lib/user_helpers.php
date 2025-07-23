@@ -61,3 +61,15 @@ function get_user_id()
     }
     return -1;
 }
+function get_user_loc() {
+    if (is_logged_in()) { //we need to check for login first because "user" key may not exist
+        return se($_SESSION["user"], "tz_loc", "", false);
+    }
+    return -1;
+}
+function get_user_gmt() {
+    if (is_logged_in()) { //we need to check for login first because "user" key may not exist
+        return (int) se($_SESSION["user"], "gmt", "", false);
+    }
+    return -1;
+}

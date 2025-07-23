@@ -1,156 +1,116 @@
 <?php
 require(__DIR__ . "/../../partials/nav.php");
-if (is_logged_in(true)) {
-    error_log("Session data: " . var_export($_SESSION, true));
-}
-$allowed_columns = ["symbol", "open", "low", "high", "price", "change_percent", "latest_trading_day", "volume"];
-$sort = ["asc", "desc"];
+error_log("Session: " . var_export($_SESSION, true));
 
-$params = [];
-$query = "SELECT id, symbol, open, low, high, price, change_percent, latest_trading_day, volume, is_api FROM `IT202-M25-Stocks`
-WHERE 1=1";// used for easy append of other clauses
-if(count($_GET)> 0){
-    $symbol = se($_GET, "symbol", "", false);
-    if(!empty($symbol)){
-        $query .= " AND symbol like :symbol";
-        $params[":symbol"] = "%$symbol%";
-    }
-    $latest_trading_day = se($_GET, "latest_trading_day", "", false);
-    if(!empty($latest_trading_day)){
-        $query .= " AND latest_trading_day >= :latest_trading_day";
-        $params[":latest_trading_day"] = $latest_trading_day;
-    }
-    $column = se($_GET, "column", "", false);
-    if(empty($column) || !in_array($column, $allowed_columns)){
-        $column = "created";
-    }
-    $order = se($_GET, "order", "", false);
-    if(empty($order) || !in_array($order, $sort)){
-        $order = "desc";
-    }
-    // make sure values are trusted
-    $query .= " ORDER BY $column $order";
-    $limit = se($_GET, "limit", 10, false);
-    if(!empty($limit) && is_numeric($limit)){
-        if($limit < 1 || $limit > 100){
-            $limit = 10;
-        }   
-        $query .= " LIMIT :limit";
-        $params[":limit"] = $limit;
-    }
+if (!is_logged_in()) {
+    die(header("Location: login.php"));
 }
-$db = getDB();
-$stmt = $db->prepare($query);
-error_log("Query: " . $query);
-error_log("Params: " . var_export($params, true));
-foreach($params as $key=>$v){
-    // determine PDOPAram type
-    $type = match (true) {
-        is_numeric($v)   => PDO::PARAM_INT,
-        is_bool($v)  => PDO::PARAM_BOOL,
-        is_null($v)  => PDO::PARAM_NULL,
-        default          => PDO::PARAM_STR,
-    };
-    $stmt->bindValue("$key", $v,$type);
-}
-$results = [];
-try {
-    $stmt->execute();
-    $r = $stmt->fetchAll();
-    if ($r) {
-        $results = $r;
-    }
-} catch (PDOException $e) {
-    error_log("Error fetching stocks " . var_export($e, true));
-    flash("Unhandled error occurred", "danger");
-}
-// TODO filter/sort (last resort if brokers aren't added in this lesson)
-
-// form field for symbol
-// form field date range for latest_trading_day
-// form field for is_api
-// form field for column names
-// form field for asc/desc
-
-$cols = array_map(function ($col) {
-    return [$col => $col];
-}, $allowed_columns);
-array_unshift($cols, [""=>"Select Column"]);
-$order = array_map(function ($col) {
-    return [$col => $col];
-}, $sort);
-array_unshift($order, [""=>"Select Order"]);
-$form = [
-    [
-        "type" => "text",
-        "id" => "symbol",
-        "name" => "symbol",
-        "label" => "Stock Symbol",
-        "value"=> se($_GET, "symbol", "", false),
-    ],
-    [
-        "type" => "date",
-        "id" => "latest_trading_day",
-        "name" => "latest_trading_day",
-        "label" => "Latest Trading Day",
-        "value"=> se($_GET, "latest_trading_day", "", false),
-    ],
-    [
-        "type" => "select",
-        "id" => "column",
-        "name" => "column",
-        "label" => "Column",
-        "options" => $cols,
-        "value" => se($_GET, "column", "", false),
-    ],
-    [
-        "type" => "select",
-        "id" => "order",
-        "name" => "order",
-        "label" => "Order",
-        "options" => $order,
-        "value" => se($_GET, "order", "", false),
-    ],
-    [
-        "type"=>"number",
-        "id"=>"limit",
-        "name"=>"limit",
-        "label"=>"Limit",
-        "value"=>se($_GET, "limit", "10", false),
-        "rules"=>["min"=>1, "max"=>100]
-    ]
-]
 ?>
-<div class="container-fluid">
-    <h1>Home</h1>
-    <div>
-        <form>
-            <div class="row">
-            <?php foreach ($form as $field): ?>
-                <div class="col">
-                    <?php render_input($field); ?>
-                </div>
-            <?php endforeach; ?>
-            </div>
-            <?php render_button(["text" => "Search", "type" => "submit"]); ?>
-            <!-- Uses `?` to remove all query params (normal reset doesn't work here
-             because a regular reset "resets" back to the values the form loaded in with.
-             Sticky forms will "reset" to what was last applied) -->
-            <a href="?" class="btn btn-secondary">Reset</a>
-        </form>
-    </div>  
-    <?php if (count($results) == 0) : ?>
-        <p>No results to show</p>
-    <?php else : ?>
-        <div class="row">
-            <?php foreach ($results as $stock): ?>
-                <div class="col">
-                    <?php render_stock_card($stock); ?>
-                </div>
-            <?php endforeach; ?>
-        </div>
+
+<div id="landing-body">
+    <?php if (is_logged_in(true)): ?>
+        <?php
+        $id = get_user_id();
+        $roles = [];
+
+        $db = getDB();
+        $stmt = $db->prepare(
+            "SELECT r.name FROM UserRoles AS ur 
+                JOIN Roles AS r ON ur.role_id = r.id
+                WHERE ur.user_id = :id AND ur.is_active = 1;"
+        );
+        try {
+            $stmt->execute([":id" => $id]);
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if ($results) {
+                $roles = $results;
+            } else {
+                $roles = [['name' => "You have no outstanding Roles."]];
+            }
+        } catch (PDOException $e) {
+            flash("There was an error finding your Roles, please contact an admin for support", "danger");
+            error_log("Error toggling role for user $id" . var_export($e->errorInfo, true));
+        }
+        ?>
+        <?php
+        $meeting_id = [];
+        $attendees = [];
+        $noMeet = false;
+
+        $db2 = getDB();
+        $stmt2 = $db2->prepare(
+            "SELECT *, m.gmt AS mgmt, u.gmt AS ugmt FROM meeting_attendees AS ma 
+                JOIN Meetings AS m ON ma.meeting_id = m.id
+                JOIN Users AS u ON ma.attendee_id = u.id
+                WHERE ma.attendee_id = :id
+                ORDER BY m.meetingDate ASC"
+        );
+        try {
+            $stmt2->execute([":id" => $id]);
+            $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+            if ($results2) {
+                $meeting_id = $results2;
+            } else {
+                array_push($meeting_id, "You have no meetings.");
+                $noMeet = true;
+            }
+        } catch (PDOException $e) {
+            flash("There was an error finding your meetings, please contact an admin for support. Code 1.", "danger");
+            error_log("Error toggling role for user $id" . var_export($e->errorInfo, true));
+        }
+        ?>
+
+        <h1 style="text-align: center;">Home Page</h1>
+        <p style="text-align: center;">Welcome, <?php echo get_username() ?>!</p>
+        <p style="text-align: center;">Your current location is: <?php echo get_user_loc() ?></p>
+        <h2> Your Roles: </h2>
+        <?php if (isset($roles)): ?>
+            <?php foreach ($roles as $role) { ?>
+                <li>
+                    <?php 
+                    echo $role['name']; 
+                    ?>
+                    <br>
+                </li>
+            <?php } ?>
+        <?php else:?>
+            <li>
+                <p>You have no roles currently</p>
+                <br>
+            </li>
+        <?php endif ?>
+        <br>
+        <h2>Meetings:</h2>
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Index</th>
+                    <th scope="col">Creator</th>
+                    <th scope="col">Message</th>
+                    <th scope="col">Date & Time</th>
+                    <th scope="col">Original Date & Time + GMT</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($meeting_id as $meeting) { ?>
+                    <tr>
+                        <th scope="row"><?php echo $meeting['meeting_id']; ?></th>
+                        <td><?php echo $meeting['host']; ?></td>
+                        <td><?php echo $meeting['message']; ?></td>
+                        <td>
+                            <?php
+                            echo convertTimezone($meeting['meetingDate'], $meeting['mgmt'], $meeting['ugmt']);
+                            ?>
+                        </td>
+                        <td><?php echo $meeting['meetingDate'] . $meeting["mgmt"]; ?></td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
     <?php endif; ?>
 </div>
+
 <?php
 require(__DIR__ . "/../../partials/flash.php");
 ?>

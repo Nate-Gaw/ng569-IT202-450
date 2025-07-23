@@ -114,7 +114,7 @@ if (isset($_POST["email"], $_POST["password"])) {
             //TODO 4: Check password and fetch user
             $db = getDB();
             // fetch by email or username
-            $stmt = $db->prepare("SELECT id, email, password, username from Users where email = :email OR username = :email");
+            $stmt = $db->prepare("SELECT id, email, password, username, tz_loc, gmt from Users where email = :email OR username = :email");
             try {
                 $r = $stmt->execute([":email" => $email]);
                 if ($r) {
