@@ -74,11 +74,11 @@ function get_user_gmt() {
     return -1;
 }
 /**
- * Update users location and gmt
+ * Update users location and gmt in session 
  * @param string $location Enter users latest location
  * @param int $gmt Enter users lastest gmt
  */
-function update_user_info($location, $gmt) {
+function update_user_location($location, $gmt) {
     if (is_logged_in()) {
         update_user_loc($location);
         update_user_gmt($gmt);

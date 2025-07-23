@@ -155,7 +155,7 @@ input[type="submit"]:hover {
     transform: scale(1.15)
 }
 input[type="submit"]:active {
-     transform: scale(.75)
+    transform: scale(.75)
 }
 .dropdown-menu li {
     border-radius: 0;

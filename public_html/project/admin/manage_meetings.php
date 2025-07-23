@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
     </thead>
     <tbody>
         <?php foreach ($meetings as $meeting) { ?>
-            <tr>
+            <tr data-href="/project/check_attendees.php?index=<?php echo $meeting['id'];?>">
                 <th scope="row"><?php echo $meeting['id']; ?></th>
                 <td><?php echo $meeting['host']; ?></td>
                 <td><?php echo $meeting['message']; ?></td>
@@ -76,6 +76,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
         <?php } ?>
     </tbody>
 </table>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("tr[data-href]").forEach(row => {
+        row.style.cursor = "pointer";
+        row.addEventListener("click", () => {
+            window.location.href = row.getAttribute("data-href");
+        });
+    });
+});
+</script>
+
 <?php
 //note we need to go up 1 more directory
 require_once(__DIR__ . "/../../../partials/flash.php");

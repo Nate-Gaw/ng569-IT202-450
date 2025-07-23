@@ -199,7 +199,7 @@ if (isset($_POST["location"])) {
                         flash("No changes made to password", "warning");
                     } else if ($updated_rows == 1) {
                         flash("Location updated successfully", "success");
-                        update_user_info(se($result, "timezone_location", null, false), (int) se($result, "gmt_offset", null, false));
+                        update_user_location(se($result, "timezone_location", null, false), (int) se($result, "gmt_offset", null, false));
                     } else {
                         // this shouldn't happen, but we log it just in case
                         error_log("Unexpected number of rows updated for location change: " . $updated_rows);

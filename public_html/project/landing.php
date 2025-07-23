@@ -8,7 +8,7 @@ if (!is_logged_in()) {
 ?>
 
 <div id="landing-body">
-    <?php if (is_logged_in(true)): ?>
+    <?php if (is_logged_in()): ?>
         <?php
         $id = get_user_id();
         $roles = [];
@@ -81,6 +81,7 @@ if (!is_logged_in()) {
         <?php endif ?>
         <br>
         <h2>Meetings:</h2>
+        <p>(Click to check attendees)</p>
 
         <table class="table table-hover">
             <thead>
@@ -94,7 +95,7 @@ if (!is_logged_in()) {
             </thead>
             <tbody>
                 <?php foreach ($meeting_id as $meeting) { ?>
-                    <tr>
+                    <tr data-href="check_attendees.php?index=<?php echo $meeting['meeting_id'];?>">
                         <th scope="row"><?php echo $meeting['meeting_id']; ?></th>
                         <td><?php echo $meeting['host']; ?></td>
                         <td><?php echo $meeting['message']; ?></td>
@@ -110,6 +111,17 @@ if (!is_logged_in()) {
         </table>
     <?php endif; ?>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("tr[data-href]").forEach(row => {
+        row.style.cursor = "pointer";
+        row.addEventListener("click", () => {
+            window.location.href = row.getAttribute("data-href");
+        });
+    });
+});
+</script>
 
 <?php
 require(__DIR__ . "/../../partials/flash.php");
