@@ -80,7 +80,7 @@ if (isset($_GET["index"])) {
     <table class="table table-hover">
         <thead>
             <tr>
-                <th scope="col">Index</th>
+                <th scope="col">Meeting ID</th>
                 <th scope="col">Creator</th>
                 <th scope="col">Message</th>
                 <th scope="col">Date & Time</th>
@@ -103,10 +103,10 @@ if (isset($_GET["index"])) {
             </tbody>
         </div>
     </table>
+    <h4>Attendees: </h4>
     <table class="table">
         <thead class="thead-dark">
             <tr>
-                <th scope="col">Meeting ID</th>
                 <th scope="col">Username</th>
                 <th scope="col">Email</th>
                 <th scope="col">Location</th>
@@ -115,8 +115,7 @@ if (isset($_GET["index"])) {
         <tbody>
             <?php foreach ($ma as $attendee): ?>
                 <tr>
-                    <th scope="row"><?php echo $attendee['meeting_id'] ?></th>
-                    <td><?php echo $attendee['username'] ?></td>
+                    <th scope="row"><?php echo $attendee['username'] ?></th>
                     <td><?php echo $attendee['email'] ?></td>
                     <td><?php echo $attendee['tz_loc'] ?></td>
                 </tr>

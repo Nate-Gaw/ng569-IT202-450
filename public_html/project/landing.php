@@ -25,7 +25,7 @@ if (!is_logged_in()) {
             if ($results) {
                 $roles = $results;
             } else {
-                $roles = [['name' => "You have no outstanding Roles."]];
+                $roles = [['name' => "You have no outstanding Roles.",'is_active' => 0]];
             }
         } catch (PDOException $e) {
             flash("There was an error finding your Roles, please contact an admin for support", "danger");
@@ -65,7 +65,7 @@ if (!is_logged_in()) {
         <p style="text-align: center;">Your current location is: <?php echo get_user_loc() ?></p>
         <h2> Your Roles: </h2>
         <ul class="list-group" style="width: 10vw;">
-            <?php if (isset($roles)): ?>
+            <?php if (!empty($roles)): ?>
                 <?php foreach ($roles as $role): ?>
                     <?php if ($role["is_active"] == 0): ?>
                         <li class="list-group-item" title="Disabled" style="background-color: red; color: lightgray;">
@@ -116,7 +116,11 @@ if (!is_logged_in()) {
                                 echo convertTimezone($meeting['meetingDate'], $meeting['mgmt'], $meeting['ugmt']);
                                 ?>
                             </td>
-                            <td><?php echo $meeting['meetingDate'] . $meeting["mgmt"]; ?></td>
+                            <?php if ($meeting['mgmt'] > 0): ?>
+                                <td><?php echo $meeting['meetingDate'] . "+" . $meeting["mgmt"]; ?></td>
+                            <?php else: ?>
+                                <td><?php echo $meeting['meetingDate'] . $meeting["mgmt"]; ?></td>
+                            <?php endif ?>
                         </tr>
                     <?php } ?>
                 </tbody>
