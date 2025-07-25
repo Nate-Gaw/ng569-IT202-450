@@ -70,7 +70,7 @@ if (isset($_GET["index"])) {
         <div class="input-group-prepend">
             <span class="input-group-text">Enter Meeting Index:</span>
         </div>
-        <input type="number" class="form-control" id="ca_index" name="index">
+        <input type="number" class="form-control" id="index" name="index" required>
         <div class="input-group-append">
             <button class="btn btn-info" type="submit">Search</button>
         </div>
@@ -123,6 +123,18 @@ if (isset($_GET["index"])) {
         </tbody>
     </table>
 <?php endif ?>
+
+<script>
+    function validate(form) {
+        index = form.index.value;
+        isValid = true;
+        if (empty(index)) { 
+            flash("input cannot be empty", "danger");
+            isValid = false;
+        }
+        return isValid;
+    }
+</script>
 
 <?php
 require(__DIR__ . "/../../partials/flash.php");

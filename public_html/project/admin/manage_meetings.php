@@ -51,6 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
             <th scope="col">Message</th>
             <th scope="col">Date & Time</th>
             <th scope="col">Original Date & Time + GMT</th>
+            <th scope="col">Edit</th>
             <th scope="col">DELETE</th>
         </tr>
     </thead>
@@ -66,6 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
                     ?>
                 </td>
                 <td><?php echo $meeting['meetingDate'] . $meeting["gmt"]; ?></td>
+                <td>
+                    <button class="btn btn-warning" onclick="event.stopPropagation(); window.location.href='/../project/editor.php?id=<?php echo $meeting['id']; ?>&timestamp=<?php echo $meeting['meetingDate']; ?>'">Edit</button>
+                </td>
                 <td>
                     <form method="POST">
                         <input type="hidden" name="delete_id" value="<?php echo $meeting['id']; ?>">

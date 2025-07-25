@@ -162,7 +162,7 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
 <?php if ($access): ?>
     <p style="margin: 10px;">Meeting date and time is based on your current location of <?php echo get_user_loc() . get_user_gmt() ?></p>
     <p style="text-align: center; color:Yellow; margin:0px;">Please enter date and time and click "Update Table" to update the table times below</p>
-    <form method="GET" onsubmit="return validate(this);">
+    <form method="GET">
         <input type="hidden" name="id" value="<?php echo $id; ?>">
         <div class="mb-3">
             <label for="username">Date and Time</label>
@@ -219,6 +219,19 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
     <?php endif ?>
 
 <?php endif ?>
+
+<script>
+    function validate(form) {
+        let isValid = true;
+        const cb = form.querySelectorAll('input[name="checkbox[]"]');
+        const checkedCount = Array.from(cb).filter(cb => cb.checked).length;
+        if (checkedCount === 0) {
+            flash("At least one attendee must be selected.", "danger");
+            isValid = false;
+        }
+        return isValid;
+    }
+</script>
 
 <?php
 require(__DIR__ . "/../../partials/flash.php");
