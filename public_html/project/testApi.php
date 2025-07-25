@@ -26,6 +26,17 @@ if (isset($_GET["location"])) {
         "latitude":40.7127281,
         "longitude":-74.0060152
     }'];*/
+    /*
+    timezone:"America/New_York"
+    datetime:"2025-07-22 01:37:33"
+    date:"2025-07-22"
+    year:"2025"
+    month:"07"
+    day:"22"
+    hour:"01"
+    minute:"37"
+    second:"33"
+    day_of_week:"Tuesday"*/
     error_log("Response: " . var_export($result, true));
     if (se($result, "status", 400, false) == 200 && isset($result["response"])) {
         $result = json_decode($result["response"], true);

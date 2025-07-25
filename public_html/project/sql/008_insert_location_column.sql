@@ -1,0 +1,1 @@
+ALTER TABLE `Users` ADD location VARCHAR(127) not null;

@@ -20,7 +20,8 @@ require(__DIR__ . "/duplicate_user_details.php");
 require(__DIR__ . "/reset_session.php");
 require(__DIR__. "/api_helpers.php");
 
-require(__DIR__. "/stock_api.php");
+//require(__DIR__. "/stock_api.php");
 require(__DIR__. "/db_helpers.php");
 require(__DIR__. "/render_functions.php");
+require(__DIR__. "/time_conv.php");
 ?>
