@@ -150,6 +150,9 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
     }
 }
 //handle location update
+//ng569 7/25/2025
+//This waits till the user submits the location, which is then chekced to see if it's not empty and different to reduce api calls. Then regex is used to verify the location type. Then the API is called and the result is taken through a multidimentional array.
+//Then the information from the result is then parsed and placed into the DB using SQL calls
 if (isset($_POST["location"])) {
     $location = se($_POST, "location", null, false);
     $can_update = !empty($location) && $location != get_user_loc();
@@ -212,7 +215,7 @@ if (isset($_POST["location"])) {
                 flash("Location is invalid, please try again.", "danger");
             }
         } else {
-            error_log("Location is invalid", "danger");
+            flash("Location is invalid, please try again.", "danger");
         }
     }
 }
@@ -220,9 +223,10 @@ if (isset($_POST["location"])) {
 
 <h3>Profile</h3>
 <form method="POST" onsubmit="return validate(this);">
-    <!-- ng569 7/7/25
+    <!-- ng569 7/25/25
      HTML validation email and username are required and new and confirm password is required and has minimum length.
-     The current password is required but there is no minlength just in case somehow they register or change their password without req-->
+     The current password is required but there is no minlength just in case somehow they register or change their password without req
+     location can only have letters slashes and underscore-->
     <div class="mb-3">
         <label for="email">Email</label>
         <input type="email" name="email" id="email" value="<?php se($email); ?>" required />
@@ -248,15 +252,16 @@ if (isset($_POST["location"])) {
     <div>Change Location:</div>
     <div class="mb-3">
         <label for="cp">Location</label>
-        <input type="text" pattern="^[A-Za-z\s\/\_]+$" value=<?php echo get_user_loc(); ?> title="Letters Only" name="location" id="loc" />
+        <input type="text" pattern=^[A-Za-z\s\/\_]+$ value=<?php echo htmlspecialchars(get_user_loc()); ?> title="Letters Only" name="location" id="loc" />
     </div>
     <br>
     <input type="submit" value="Update Profile" name="save" />
 </form>
 
 <script>
-    //ng569 7/7/25
+    //ng569 7/25/25
     //Double checks to make sure that the inputs are NOT empty and checks for valid inputs and matching passwords
+    //if passwords is left empty, then passwords is not changing if locatino is empty then locatino is not being updated. THis just allows the user to update specific things in their profile without the need to update everything
     function validate(form) {
         let pw = form.currentPassword.value;
         let npw = form.newPassword.value;

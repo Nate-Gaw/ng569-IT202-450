@@ -82,6 +82,8 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["userna
     // TODO 3: validate/use
     $hasError = false;
 
+    //ng569 7/25/2025
+    //locaiton is placed into the API, where it will be checked to see if the API returns anything, if it does then it was a success and will go through an SQL call to be placed into the DB, if not then an error is returned
     $data = ["location" => $location];
     $endpoint = "https://world-time-by-based-api.p.rapidapi.com/v1/worldtime/";
     $isRapidAPI = true;
@@ -105,6 +107,7 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["userna
         $result = json_decode($result["response"], true);
     } else {
         $result = [];
+        flash("Location was not recognized.", "danger");
         $hasError = true;
     }
 
