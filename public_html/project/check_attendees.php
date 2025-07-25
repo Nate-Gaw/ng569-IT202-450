@@ -22,7 +22,7 @@ if (isset($_GET["index"])) {
             $stmt->execute([":index" => $index]);
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if ($results) {
-                foreach($results as $id) {
+                foreach ($results as $id) {
                     if ($id['attendee_id'] == get_user_id()) {
                         $verify = true;
                     }
@@ -31,13 +31,14 @@ if (isset($_GET["index"])) {
         } catch (PDOException $e) {
             flash("Couldn't verify your status. Code 8." . var_export($e->errorInfo, true), "danger");
         }
-    } else if(has_role("Admin")) $verify = true;
+    } else if (has_role("Admin")) $verify = true;
 
     if (!empty($index) && $verify) {
         $db = getDB();
         $stmt = $db->prepare(
-            "SELECT ma.meeting_id, u.username, u.email, u.tz_loc FROM meeting_attendees AS ma
+            "SELECT ma.meeting_id, u.username, u.email, u.tz_loc, m.host, m.message, m.meetingDate, m.gmt FROM meeting_attendees AS ma
         JOIN Users AS u ON ma.attendee_id = u.id 
+        JOIN Meetings AS m ON ma.meeting_id = m.id
         WHERE ma.meeting_id = :index"
         );
         try {
@@ -62,7 +63,7 @@ if (isset($_GET["index"])) {
 ?>
 
 <br>
-<h1 style="text-align: center;">Check Attendees Invited</h1>
+<h1 style="text-align: center;">Check Meeting Details</h1>
 <br>
 <form method="GET" onsubmit="return validate(this);">
     <div class="input-group mb-3">
@@ -75,26 +76,54 @@ if (isset($_GET["index"])) {
         </div>
     </div>
 </form>
-<table class="table">
-    <thead class="thead-dark">
-        <tr>
-            <th scope="col">Meeting ID</th>
-            <th scope="col">Username</th>
-            <th scope="col">Email</th>
-            <th scope="col">Location</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($ma as $attendee): ?>
+<?php if (!empty($ma)): ?>
+    <table class="table table-hover">
+        <thead>
             <tr>
-                <th scope="row"><?php echo $attendee['meeting_id'] ?></th>
-                <td><?php echo $attendee['username'] ?></td>
-                <td><?php echo $attendee['email'] ?></td>
-                <td><?php echo $attendee['tz_loc'] ?></td>
+                <th scope="col">Index</th>
+                <th scope="col">Creator</th>
+                <th scope="col">Message</th>
+                <th scope="col">Date & Time</th>
+                <th scope="col">Original Date & Time + GMT</th>
             </tr>
-        <?php endforeach ?>
-    </tbody>
-</table>
+        </thead>
+        <div class="tbodyScroll">
+            <tbody>
+                <tr data-href="check_attendees.php?index=<?php echo $ma[0]['meeting_id']; ?>">
+                    <th scope="row"><?php echo $ma[0]['meeting_id']; ?></th>
+                    <td><?php echo $ma[0]['host']; ?></td>
+                    <td><?php echo $ma[0]['message']; ?></td>
+                    <td>
+                        <?php
+                        echo convertTimezone($ma[0]['meetingDate'], $ma[0]['gmt'], get_user_gmt());
+                        ?>
+                    </td>
+                    <td><?php echo $ma[0]['meetingDate'] . $ma[0]["gmt"]; ?></td>
+                </tr>
+            </tbody>
+        </div>
+    </table>
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Meeting ID</th>
+                <th scope="col">Username</th>
+                <th scope="col">Email</th>
+                <th scope="col">Location</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($ma as $attendee): ?>
+                <tr>
+                    <th scope="row"><?php echo $attendee['meeting_id'] ?></th>
+                    <td><?php echo $attendee['username'] ?></td>
+                    <td><?php echo $attendee['email'] ?></td>
+                    <td><?php echo $attendee['tz_loc'] ?></td>
+                </tr>
+            <?php endforeach ?>
+        </tbody>
+    </table>
+<?php endif ?>
 
 <?php
 require(__DIR__ . "/../../partials/flash.php");

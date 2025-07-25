@@ -46,7 +46,7 @@
 </style>
 <div class="jumbotron">
     <!-- TODO replace your name -->
-    <h1 class="display-4">Welcome to Matt's project</h1>
+    <h1 class="display-4">Welcome to Nathanael's project</h1>
     <!-- TODO change Date/Semester accordingly -->
     <p class="lead">This is for the Summer semester of IT202 2025</p>
     <p>

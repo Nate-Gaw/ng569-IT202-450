@@ -141,7 +141,7 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
             <div class="input-group-prepend">
                 <span class="input-group-text">Message (Max 255 characters)</span>
             </div>
-            <textarea class="form-control" name="message" maxlength=255 aria-label="With textarea"></textarea>
+            <textarea class="form-control" name="message" maxlength="255" aria-label="With textarea"></textarea>
         </div>
         <input type="submit" value="Create Meeting" name="save" />
     </form>

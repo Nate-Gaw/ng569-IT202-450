@@ -82,7 +82,7 @@ session_start();
                             </li>
                             <li><a class="dropdown-item" aria-current="page" href="<?php echo get_url('edit_meetings.php'); ?>">Edit Your Meetings</a>
                             </li>
-                            <li><a class="dropdown-item" aria-current="page" href="<?php echo get_url('check_attendees.php'); ?>">Check Attendees</a>
+                            <li><a class="dropdown-item" aria-current="page" href="<?php echo get_url('check_attendees.php'); ?>">Check Meeting Details</a>
                             </li>
                             <?php if (has_role("Admin")) : ?>
                                 <li class="nav-item">

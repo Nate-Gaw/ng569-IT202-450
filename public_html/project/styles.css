@@ -51,12 +51,14 @@
         color: #fff;
     }
 }
+
 /* Update the below for Milestone 1 requirements */
 nav li {
     background-color: grey;
     border-radius: 10px;
     padding-top: 5px;
-    padding-bottom: 5px;;
+    padding-bottom: 5px;
+    ;
     list-style-type: none;
     display: flex;
     width: 10vw;
@@ -73,7 +75,7 @@ nav ul {
 
 nav {
     padding: 3px;
-    background-color:bisque;
+    background-color: bisque;
     position: sticky;
     display: flex;
     width: 100%;
@@ -86,54 +88,74 @@ nav li a {
     text-decoration: none;
     text-align: center;
 }
+
 nav li:hover {
     background-color: lightgrey;
     text-decoration: underline;
     text-decoration-color: black;
 }
 
-label{
-    border:#212529 solid 2px;
+label {
+    border: #212529 solid 2px;
     padding: 5px;
     background-color: bisque;
-    color:black;
+    color: black;
 }
+
 input {
     border-radius: 10%;
     padding: .25rem;
 }
-form,h3 {
+
+form,
+h3 {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-left: auto;
     margin-right: auto;
 }
+
 h3 {
     color: red;
 }
 
 form div {
     margin: 5px;
-    color:greenyellow;
+    color: greenyellow;
 }
 
-table, td {
-    border: 1px solid black;
-}
 table {
-    display: flexbox;
+    border-collapse: collapse;
     width: 100%;
 }
-td, th {
-    padding: 10px;
-    flex: 1;
-    width: 10%;
-    height: 5vh;
+
+th,
+td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
 }
+
+thead {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 2;
+    color: orange;
+}
+
+.tbodyScroll {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+td,
 th {
-    color: darkcyan;
+    height: 40px;
+    box-sizing: border-box;
 }
+
 .desc {
     overflow-y: scroll;
     width: auto;
@@ -143,20 +165,24 @@ th {
 #AssignUsers {
     height: 10vh;
 }
+
 #AssignRoles {
     margin: 15px;
 }
 
 body {
     background-color: darkslategray;
-    color:tomato;
+    color: tomato;
 }
+
 input[type="submit"]:hover {
     transform: scale(1.15)
 }
+
 input[type="submit"]:active {
     transform: scale(.75)
 }
+
 .dropdown-menu li {
     border-radius: 0;
 }
@@ -164,9 +190,11 @@ input[type="submit"]:active {
 #landing-body {
     margin-left: 20px;
 }
+
 #landing-body li {
     margin-left: 40px;
 }
+
 .input-group {
     display: flex;
     justify-content: center;

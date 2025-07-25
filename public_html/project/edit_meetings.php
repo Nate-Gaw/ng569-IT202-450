@@ -1,9 +1,11 @@
 <?php
-//note we need to go up 1 more directory
 require(__DIR__ . "/../../partials/nav.php");
 
 if (!is_logged_in()) {
     die(header("Location: login.php"));
+}
+if(isset($_GET['success'])) {
+    flash("Successfully deleted meeting!", "success");
 }
 
 $meetings = [];
@@ -30,11 +32,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
     $stmt2 = $db->prepare("DELETE FROM Meetings WHERE id = :id");
     try {
         $stmt2->execute([":id" => $id]);
+        header("Location: " . $_SERVER['PHP_SELF'] . "?success=true"); //reload page
     } catch (PDOException $e) {
         flash("There was an error deleting meetings, please contact an admin for support Code 6", "danger");
         error_log("Error deleting meetings" . var_export($e->errorInfo, true));
     }
-    header("Location: " . $_SERVER['PHP_SELF']); //reload page
 }
 ?>
 
@@ -49,12 +51,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
             <th scope="col">Message</th>
             <th scope="col">Date & Time</th>
             <th scope="col">Original Date & Time + GMT</th>
+            <th scope="col">EDIT</th>
             <th scope="col">DELETE</th>
         </tr>
     </thead>
     <tbody>
         <?php foreach ($meetings as $meeting) { ?>
-            <tr>
+            <tr data-href="check_attendees.php?index=<?php echo $meeting['id']; ?>">
                 <th scope="row"><?php echo $meeting['id']; ?></th>
                 <td><?php echo $meeting['host']; ?></td>
                 <td><?php echo $meeting['message']; ?></td>
@@ -65,6 +68,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
                 </td>
                 <td><?php echo $meeting['meetingDate'] . $meeting["gmt"]; ?></td>
                 <td>
+                    <button class="btn btn-warning" onclick="event.stopPropagation(); window.location.href='editor.php?id=<?php echo $meeting['id']; ?>&timestamp=<?php echo $meeting['meetingDate']; ?>'">Edit</button>
+                </td>
+                <td>
                     <form method="POST">
                         <input type="hidden" name="delete_id" value="<?php echo $meeting['id']; ?>">
                         <button id="delete" type="submit" class="btn btn-danger"> Delete?</button>
@@ -74,7 +80,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
         <?php } ?>
     </tbody>
 </table>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("tr[data-href]").forEach(row => {
+            row.style.cursor = "pointer";
+            row.addEventListener("click", () => {
+                window.location.href = row.getAttribute("data-href");
+            });
+        });
+    });
+</script>
+
 <?php
-//note we need to go up 1 more directory
-require_once(__DIR__ . "/../../partials/flash.php");
+require(__DIR__ . "/../../partials/flash.php");
 ?>

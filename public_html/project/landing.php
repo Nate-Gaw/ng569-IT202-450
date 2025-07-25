@@ -15,9 +15,9 @@ if (!is_logged_in()) {
 
         $db = getDB();
         $stmt = $db->prepare(
-            "SELECT r.name FROM UserRoles AS ur 
+            "SELECT r.name, r.is_active FROM UserRoles AS ur 
                 JOIN Roles AS r ON ur.role_id = r.id
-                WHERE ur.user_id = :id AND r.is_active = 1;"
+                WHERE ur.user_id = :id;"
         );
         try {
             $stmt->execute([":id" => $id]);
@@ -64,21 +64,32 @@ if (!is_logged_in()) {
         <p style="text-align: center;">Welcome, <?php echo get_username() ?>!</p>
         <p style="text-align: center;">Your current location is: <?php echo get_user_loc() ?></p>
         <h2> Your Roles: </h2>
-        <?php if (isset($roles)): ?>
-            <?php foreach ($roles as $role) { ?>
+        <ul class="list-group" style="width: 10vw;">
+            <?php if (isset($roles)): ?>
+                <?php foreach ($roles as $role): ?>
+                    <?php if ($role["is_active"] == 0): ?>
+                        <li class="list-group-item" title="Disabled" style="background-color: red; color: lightgray;">
+                            <?php
+                            echo $role['name'];
+                            ?>
+                            <br>
+                        </li>
+                    <?php else: ?>
+                        <li class="list-group-item" title="Enabled" style="background-color: lightgreen;">
+                            <?php
+                            echo $role['name'];
+                            ?>
+                            <br>
+                        </li>
+                    <?php endif ?>
+                <?php endforeach ?>
+            <?php else: ?>
                 <li>
-                    <?php 
-                    echo $role['name']; 
-                    ?>
+                    <p>You have no roles currently</p>
                     <br>
                 </li>
-            <?php } ?>
-        <?php else:?>
-            <li>
-                <p>You have no roles currently</p>
-                <br>
-            </li>
-        <?php endif ?>
+            <?php endif ?>
+        </ul>
         <br>
         <h2>Meetings:</h2>
         <p>(Click to check attendees)</p>
@@ -93,34 +104,36 @@ if (!is_logged_in()) {
                     <th scope="col">Original Date & Time + GMT</th>
                 </tr>
             </thead>
-            <tbody>
-                <?php foreach ($meeting_id as $meeting) { ?>
-                    <tr data-href="check_attendees.php?index=<?php echo $meeting['meeting_id'];?>">
-                        <th scope="row"><?php echo $meeting['meeting_id']; ?></th>
-                        <td><?php echo $meeting['host']; ?></td>
-                        <td><?php echo $meeting['message']; ?></td>
-                        <td>
-                            <?php
-                            echo convertTimezone($meeting['meetingDate'], $meeting['mgmt'], $meeting['ugmt']);
-                            ?>
-                        </td>
-                        <td><?php echo $meeting['meetingDate'] . $meeting["mgmt"]; ?></td>
-                    </tr>
-                <?php } ?>
-            </tbody>
+            <div class="tbodyScroll">
+                <tbody>
+                    <?php foreach ($meeting_id as $meeting) { ?>
+                        <tr data-href="check_attendees.php?index=<?php echo $meeting['meeting_id']; ?>">
+                            <th scope="row"><?php echo $meeting['meeting_id']; ?></th>
+                            <td><?php echo $meeting['host']; ?></td>
+                            <td><?php echo $meeting['message']; ?></td>
+                            <td>
+                                <?php
+                                echo convertTimezone($meeting['meetingDate'], $meeting['mgmt'], $meeting['ugmt']);
+                                ?>
+                            </td>
+                            <td><?php echo $meeting['meetingDate'] . $meeting["mgmt"]; ?></td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </div>
         </table>
     <?php endif; ?>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("tr[data-href]").forEach(row => {
-        row.style.cursor = "pointer";
-        row.addEventListener("click", () => {
-            window.location.href = row.getAttribute("data-href");
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("tr[data-href]").forEach(row => {
+            row.style.cursor = "pointer";
+            row.addEventListener("click", () => {
+                window.location.href = row.getAttribute("data-href");
+            });
         });
     });
-});
 </script>
 
 <?php
