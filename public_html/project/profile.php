@@ -157,7 +157,7 @@ if (isset($_POST["location"])) {
     $location = se($_POST, "location", null, false);
     $can_update = !empty($location) && $location != get_user_loc();
     if ($can_update) {
-        if (preg_match('/^[A-Za-z\s\/\_]+$/', $location)) {
+        if (preg_match('/^[A-Za-z\s\/_]+$/', $location)) {
 
             $data = ["location" => $location];
             $endpoint = "https://world-time-by-based-api.p.rapidapi.com/v1/worldtime/";
@@ -212,7 +212,7 @@ if (isset($_POST["location"])) {
                     error_log("Error processing location change: " . var_export($e, true));
                 }
             } else {
-                flash("Location is invalid, please try again.", "danger");
+                flash("Location doesn't exist, please try again.", "danger");
             }
         } else {
             flash("Location is invalid, please try again.", "danger");
@@ -252,7 +252,7 @@ if (isset($_POST["location"])) {
     <div>Change Location:</div>
     <div class="mb-3">
         <label for="cp">Location</label>
-        <input type="text" pattern=^[A-Za-z\s\/\_]+$ value=<?php echo htmlspecialchars(get_user_loc()); ?> title="Letters Only" name="location" id="loc" />
+        <input type="text" value=<?php echo htmlspecialchars(get_user_loc()); ?> title="Letters Only"  pattern='^[A-Za-z\s\/_]+$' name="location" id="location" />
     </div>
     <br>
     <input type="submit" value="Update Profile" name="save" />
@@ -263,9 +263,9 @@ if (isset($_POST["location"])) {
     //Double checks to make sure that the inputs are NOT empty and checks for valid inputs and matching passwords
     //if passwords is left empty, then passwords is not changing if locatino is empty then locatino is not being updated. THis just allows the user to update specific things in their profile without the need to update everything
     function validate(form) {
-        let pw = form.currentPassword.value;
-        let npw = form.newPassword.value;
-        let cpw = form.confirmPassword.value;
+        let pw = form.cp.value;
+        let npw = form.np.value;
+        let cpw = form.conp.value;
         let email = form.email.value;
         let user = form.username.value;
         let loc = form.location.value;
@@ -313,6 +313,12 @@ if (isset($_POST["location"])) {
         }
         if (empty(loc)) {
             emptyLoc = true;
+        } else {
+            const pattern = /^[A-Za-z\s\/_]+$/;
+            if (!pattern.test(loc)) {
+                flash("Location is invalid.", "danger");
+                isValid = false;
+            }
         }
         if (emptyLoc && emptyPass) {
             flash("Nothing to update in form.", "danger");

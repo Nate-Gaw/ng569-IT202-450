@@ -15,7 +15,7 @@ $form = [
     ],
     ["type" => "password", "id" => "password", "name" => "password", "label" => "Password", "rules" => ["required" => true, "minlength" => 8]],
     ["type" => "password", "id" => "confirm", "name" => "confirm", "label" => "Confirm Password", "rules" => ["required" => true, "minlength" => 8]],
-    ["type" => "text", "id" => "location", "name" => "location", "label" => "Location", "rules" => ["required" => true, "pattern" => "^[A-Za-z\s\/\_]+$"]],
+    ["type" => "text", "id" => "location", "name" => "location", "label" => "Location", "rules" => ["required" => true, "pattern" => "^[A-Za-z\s\/_]+$"]],
 ];
 ?>
 <div class="container-fluid">
@@ -38,6 +38,7 @@ $form = [
         let com = form.confirm.value;
         let user = form.username.value;
         let email = form.email.value;
+        let loc = form.location.value;
         let isValid = true;
         if (empty(email)) {
             flash("Email/Username must not be empty.", "danger");
@@ -59,8 +60,14 @@ $form = [
             flash("Username must be lowercase, alphanumerical, and can only contain _ or -", "danger");
             isValid = false;
         }
+
         if (!isValidConfirm(pw, com)) {
             flash("Passwords must match.", "danger");
+            isValid = false;
+        }
+        const pattern = /^[A-Za-z\s\/_]+$/;
+        if (!pattern.test(loc) || empty(loc)) {
+            flash("Location is invalid.", "danger");
             isValid = false;
         }
         return isValid;
@@ -152,7 +159,7 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["userna
         // Code for inserting user data into the database
         $stmt = $db->prepare("INSERT INTO Users (email, password, username, location, tz_name, tz_loc, tz_abb, gmt) VALUES (:email, :password, :username, :location, :tz_name, :tz_loc, :tz_abb, :gmt)");
         try {
-            $stmt->execute([':email' => $email, ':password' => $hashed_password, ':username' => $username, ":location"=> $location, ":tz_name"=> $result["timezone_name"], ":tz_loc"=> $result["timezone_location"], ":tz_abb"=> $result["timezone_abbreviation"], ":gmt"=> $result["gmt_offset"]]);
+            $stmt->execute([':email' => $email, ':password' => $hashed_password, ':username' => $username, ":location" => $location, ":tz_name" => $result["timezone_name"], ":tz_loc" => $result["timezone_location"], ":tz_abb" => $result["timezone_abbreviation"], ":gmt" => $result["gmt_offset"]]);
 
             flash("Successfully registered! You can now log in.", "success");
         } catch (PDOException $e) {
