@@ -1,50 +1,63 @@
 <?php
 require(__DIR__ . "/../../partials/nav.php");
+$form = [
+    [
+        "type" => "text",
+        "id" => "email",
+        "name" => "email",
+        "label" => "Email/Username",
+        "value" => se($_POST, "email", "", false),
+        "rules" => ["required" => true]
+    ],
+    [
+        "type" => "password",
+        "id" => "pw",
+        "name" => "password",
+        "label" => "Password",
+        "rules" => ["required" => true, "minlength" => 8]
+    ]
+];
 ?>
-<h3>Login</h3>
-<form onsubmit="return validate(this)" method="POST">
-    <!--ng569 7/725
-    HTML Form, 2 inputs 1 for email/username and password and 1 button to submit the form-->
-    <div>
-        <label for="email">Email or Username</label>
-        <input id="email" type="text" name="email" required />
-    </div>
-    <div>
-        <label for="pw">Password</label>
-        <input type="password" id="pw" name="password" required minlength="8" />
-    </div>
-    <input type="submit" value="Login" />
-</form>
-<script>
-    function validate(form) {
-        //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
-        //ensure it returns false for an error and true for success
+<div class="container-fluid">
+    <h3>Login</h3>
+    <form onsubmit="return validate(this)" method="POST">
+        <?php foreach ($form as $field): ?>
+            <?php render_input($field); ?>
+        <?php endforeach; ?>
+        <?php render_button(["text" => "Login", "type" => "submit"]); ?>
+    </form>
+    <script>
+        function validate(form) {
+            //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
+            //ensure it returns false for an error and true for success
 
-        //ng569 7/7/25
-        //JS Validation, checks for empty email and password then checks if the password is valid, 
-        // then checks the first input to see if its a valid email or a valid username
-        let isValid = true;
-        let pw = form.password.value;
-        let email = form.email.value;
-        if (empty(email)) {
-            flash("Email/Username must not be empty.", "danger");
-            isValid = true;
+            //ng569 7/7/25
+            //JS Validation, checks for empty email and password then checks if the password is valid, 
+            // then checks the first input to see if its a valid email or a valid username
+            let isValid = true;
+            let pw = form.password.value;
+            let email = form.email.value;
+            if (empty(email)) {
+                flash("Email/Username must not be empty.", "danger");
+                isValid = true;
+            }
+            if (empty(pw)) {
+                flash("Password must not be empty.", "danger");
+                isValid = true;
+            }
+            if (!isValidPassword(pw)) {
+                flash("Password must be at least 8 characters", "warning");
+                isValid = false;
+            }
+            if (!isValidEmail(email) && !isValidUsername(email)) {
+                flash("Invalid email or username.", "danger");
+                isValid = false;
+            }
+            return isValid;
         }
-        if (empty(pw)) {
-            flash("Password must not be empty.", "danger");
-            isValid = true;
-        }
-        if (!isValidPassword(pw)) {
-            flash("Password must be at least 8 characters", "warning");
-            isValid = false;
-        }
-        if (!isValidEmail(email) && !isValidUsername(email)) {
-            flash("Invalid email or username.", "danger");
-            isValid = false;
-        }
-        return isValid;
-    }
-</script>
+    </script>
+</div>
+
 <?php
 //TODO 2: add PHP Code
 //ng569 7/7/25
@@ -101,7 +114,7 @@ if (isset($_POST["email"], $_POST["password"])) {
             //TODO 4: Check password and fetch user
             $db = getDB();
             // fetch by email or username
-            $stmt = $db->prepare("SELECT id, email, password, username from Users where email = :email OR username = :email");
+            $stmt = $db->prepare("SELECT id, email, password, username, tz_loc, gmt from Users where email = :email OR username = :email");
             try {
                 $r = $stmt->execute([":email" => $email]);
                 if ($r) {

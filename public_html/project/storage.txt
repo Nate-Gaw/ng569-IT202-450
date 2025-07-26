@@ -1,0 +1,23 @@
+<?php
+            if (!$noMeet) {
+                foreach()
+                $db3 = getDB();
+                $stmt3 = $db3->prepare(
+                    "SELECT * FROM Meetings AS m 
+                    JOIN meeting AS m ON ma.meeting_id = m.id
+                    WHERE ma.attendee_id = :id"
+                );
+                try {
+                    $stmt3->execute([":id" => $id]);
+                    $results3 = $stmt3->fetchAll(PDO::FETCH_ASSOC);
+                    if ($results3) {
+                        $attendees = $results3;
+                    } else {
+                        array_push($meeting, "No attendees.");
+                    }
+                } catch (PDOException $e) {
+                    flash("There was an error finding your attendees, please contact an admin for support. Code 2.", "danger");
+                    error_log("Error toggling role for user $id" . var_export($e->errorInfo, true));
+                }
+            }
+        ?>

@@ -1,0 +1,1 @@
+ALTER TABLE `Meetings` ADD gmt INT;
