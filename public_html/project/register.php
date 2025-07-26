@@ -1,28 +1,32 @@
 <?php
 require(__DIR__ . "/../../partials/nav.php");
+$form = [
+    ["type" => "email", "id" => "email", "name" => "email", "label" => "Email", "rules" => ["required" => true]],
+    [
+        "type" => "text",
+        "id" => "username",
+        "name" => "username",
+        "label" => "Username",
+        "rules" => [
+            "required" => true,
+            "maxlength" => 30,
+            "title" => "3-16 lowercase letters, numbers, underscores, or hyphens"
+        ]
+    ],
+    ["type" => "password", "id" => "password", "name" => "password", "label" => "Password", "rules" => ["required" => true, "minlength" => 8]],
+    ["type" => "password", "id" => "confirm", "name" => "confirm", "label" => "Confirm Password", "rules" => ["required" => true, "minlength" => 8]],
+    ["type" => "text", "id" => "location", "name" => "location", "label" => "Location", "rules" => ["required" => true, "pattern" => "^[A-Za-z\s\/_]+$"]],
+];
 ?>
-<h3>Register</h3>
-<form onsubmit="return validate(this)" method="POST">
-    <!--ng569 7/7/25 
-    HTML form with email username password inputs and a comfirm button-->
-    <div>
-        <label for="email">Email</label>
-        <input id="email" type="email" name="email" required />
-    </div>
-    <div>
-        <label for="username">Username</label>
-        <input type="text" name="username" required maxlength="30" />
-    </div>
-    <div>
-        <label for="pw">Password</label>
-        <input type="password" id="pw" name="password" required minlength="8" />
-    </div>
-    <div>
-        <label for="confirm">Confirm</label>
-        <input type="password" name="confirm" required minlength="8" />
-    </div>
-    <input type="submit" value="Register" />
-</form>
+<div class="container-fluid">
+    <h3>Register</h3>
+    <form onsubmit="return validate(this)" method="POST">
+        <?php foreach ($form as $field): ?>
+            <?php render_input($field); ?>
+        <?php endforeach; ?>
+        <?php render_button(["text" => "Register", "type" => "submit"]); ?>
+    </form>
+</div>
 <script>
     function validate(form) {
         //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
@@ -34,6 +38,7 @@ require(__DIR__ . "/../../partials/nav.php");
         let com = form.confirm.value;
         let user = form.username.value;
         let email = form.email.value;
+        let loc = form.location.value;
         let isValid = true;
         if (empty(email)) {
             flash("Email/Username must not be empty.", "danger");
@@ -55,8 +60,14 @@ require(__DIR__ . "/../../partials/nav.php");
             flash("Username must be lowercase, alphanumerical, and can only contain _ or -", "danger");
             isValid = false;
         }
-        if(!isValidConfirm(pw,com)) {
+
+        if (!isValidConfirm(pw, com)) {
             flash("Passwords must match.", "danger");
+            isValid = false;
+        }
+        const pattern = /^[A-Za-z\s\/_]+$/;
+        if (!pattern.test(loc) || empty(loc)) {
+            flash("Location is invalid.", "danger");
             isValid = false;
         }
         return isValid;
@@ -64,7 +75,7 @@ require(__DIR__ . "/../../partials/nav.php");
 </script>
 <?php
 //TODO 2: add PHP Code
-if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["username"])) {
+if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["username"], $_POST["location"])) {
     //ng569 7/7/25 
     //Everything is checked very similar to JS
     //Then if there is no error, records are retrieved from DB to check for duplicated
@@ -74,8 +85,38 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["userna
     $password = se($_POST, "password", "", false);
     $confirm = se($_POST, "confirm", "", false);
     $username = se($_POST, "username", "", false);
+    $location = se($_POST, "location", "", false);
     // TODO 3: validate/use
     $hasError = false;
+
+    //ng569 7/25/2025
+    //locaiton is placed into the API, where it will be checked to see if the API returns anything, if it does then it was a success and will go through an SQL call to be placed into the DB, if not then an error is returned
+    $data = ["location" => $location];
+    $endpoint = "https://world-time-by-based-api.p.rapidapi.com/v1/worldtime/";
+    $isRapidAPI = true;
+    $rapidAPIHost = "world-time-by-based-api.p.rapidapi.com";
+    $result = get($endpoint, "TIME_API_KEY", $data, $isRapidAPI, $rapidAPIHost);
+    //example of cached data to save the quotas, don't forget to comment out the get() if using the cached data for testing
+    /*$result = ["status" => 200, "response" => '{
+                "datetime":"2025-07-14 99:99:99",
+                "timezone_name":"Eastern Daylight Time",
+                "timezone_location":"America/New_York",
+                "timezone_abbreviation":"EDT",
+                "gmt_offset":-4,
+                "is_dst":true,
+                "requested_location":"New York",
+                "latitude":40.7127281,
+                "longitude":-74.0060152
+            }'];*/
+
+    error_log("Response: " . var_export($result, true));
+    if (se($result, "status", 400, false) == 200 && isset($result["response"])) {
+        $result = json_decode($result["response"], true);
+    } else {
+        $result = [];
+        flash("Location was not recognized.", "danger");
+        $hasError = true;
+    }
 
     if (empty($email)) {
         flash("Email must not be empty.", "danger");
@@ -116,9 +157,9 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["userna
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
         $db = getDB(); // available due to the `require()` of `functions.php`
         // Code for inserting user data into the database
-        $stmt = $db->prepare("INSERT INTO Users (email, password, username) VALUES (:email, :password, :username)");
+        $stmt = $db->prepare("INSERT INTO Users (email, password, username, location, tz_name, tz_loc, tz_abb, gmt) VALUES (:email, :password, :username, :location, :tz_name, :tz_loc, :tz_abb, :gmt)");
         try {
-            $stmt->execute([':email' => $email, ':password' => $hashed_password, ':username' => $username]);
+            $stmt->execute([':email' => $email, ':password' => $hashed_password, ':username' => $username, ":location" => $location, ":tz_name" => $result["timezone_name"], ":tz_loc" => $result["timezone_location"], ":tz_abb" => $result["timezone_abbreviation"], ":gmt" => $result["gmt_offset"]]);
 
             flash("Successfully registered! You can now log in.", "success");
         } catch (PDOException $e) {

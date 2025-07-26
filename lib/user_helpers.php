@@ -61,3 +61,32 @@ function get_user_id()
     }
     return -1;
 }
+function get_user_loc() {
+    if (is_logged_in()) { //we need to check for login first because "user" key may not exist
+        return se($_SESSION["user"], "tz_loc", "", false);
+    }
+    return -1;
+}
+function get_user_gmt() {
+    if (is_logged_in()) { //we need to check for login first because "user" key may not exist
+        return (int) se($_SESSION["user"], "gmt", "", false);
+    }
+    return -1;
+}
+/**
+ * Update users location and gmt in session 
+ * @param string $location Enter users latest location
+ * @param int $gmt Enter users lastest gmt
+ */
+function update_user_location($location, $gmt) {
+    if (is_logged_in()) {
+        update_user_loc($location);
+        update_user_gmt($gmt);
+    }
+}
+function update_user_loc($location) {
+    $_SESSION["user"]["tz_loc"] = $location;
+}
+function update_user_gmt($gmt) {
+    $_SESSION["user"]["gmt"] = $gmt;
+}
