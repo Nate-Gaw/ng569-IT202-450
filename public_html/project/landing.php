@@ -10,6 +10,9 @@ if (!is_logged_in()) {
 <div id="landing-body">
     <?php if (is_logged_in()): ?>
         <?php
+        //ng569 7/25/2025
+        //this page outputs 2 tables. One is the active and disabled roles that a user has. the other one is all the meetings the user is a apart of
+        //The filtering works through js since I was tired of having the page reload every dearch, so by using JS I was able to have he table update automatically
         $id = get_user_id();
         $roles = [];
 

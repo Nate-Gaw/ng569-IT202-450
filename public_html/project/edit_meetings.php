@@ -27,6 +27,8 @@ try {
 }
 
 //handle delete
+//ng569 7/25/2025
+//Grab post request as well as delete id sent, and delete the row. DB is cascade so every attendee is removed as well
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
     $id = $_POST["delete_id"];
     $stmt2 = $db->prepare("DELETE FROM Meetings WHERE id = :id");
@@ -63,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
                 </tr>
             </tbody>
         </table>
-<table class="table table-hover table-sm" id="meetings-table">
+<table class="table table-hover table-sm" id="meetings-table" style = "width: 100vw;">
     <thead>
         <tr>
             <th scope="col">Index</th>

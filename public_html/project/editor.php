@@ -7,6 +7,9 @@ if (!is_logged_in()) {
 if(isset($_GET['success'])) {
     flash("Successfully updated meeting!", "success");
 }
+//ng569 7/25/2025
+//This page is a hidden one. he only way to access this page is through redirect. I didn't want anyone to be able to access this page to reduce clutter on the nav
+//The meeting id is passed through GET and the page does an SQL call to grab all relevent information and output it
 
 $access = true;
 $users = [];
