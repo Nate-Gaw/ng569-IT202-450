@@ -4,7 +4,7 @@ require(__DIR__ . "/../../partials/nav.php");
 if (!is_logged_in()) {
     die(header("Location: login.php"));
 }
-if(isset($_GET['success'])) {
+if (isset($_GET['success'])) {
     flash("Successfully updated meeting!", "success");
 }
 //ng569 7/25/2025
@@ -15,6 +15,7 @@ $access = true;
 $users = [];
 $info = [];
 $attendees_id = [];
+$attending_role_id = [];
 $message = "";
 $user_gmt = get_user_gmt();
 
@@ -23,8 +24,7 @@ if (isset($_GET["id"])) {
     $id = $_GET["id"];
     $db = getDB();
     $stmt = $db->prepare(
-        "SELECT ma.meeting_id, ma.attendee_id, u.username, u.email, u.tz_loc, m.host, m.message, m.meetingDate, m.gmt FROM meeting_attendees AS ma
-        JOIN Users AS u ON ma.attendee_id = u.id 
+        "SELECT ma.attendee_id, m.host, m.message FROM meeting_attendees AS ma
         JOIN Meetings AS m ON ma.meeting_id = m.id
         WHERE ma.meeting_id = :id"
     );
@@ -53,6 +53,29 @@ if (isset($_GET["id"])) {
         array_push($attendees_id, $attendee["attendee_id"]);
     }
 
+    $db2 = getDB();
+    $stmt2 = $db2->prepare(
+        "SELECT * FROM meeting_roles
+        WHERE meeting_id = :id"
+    );
+    try {
+        $stmt2->execute([":id" => $id]);
+        $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+        if ($results2) {
+            $meeting_role_id = $results2;
+        } else {
+            array_push($meeting_role_id, "You have no meetings.");
+            $noRoleMeeting = true;
+        }
+    } catch (PDOException $e) {
+        flash("There was an error finding your meetings, please contact an admin for support. Code 1.", "danger");
+        error_log("Error toggling role for user $id" . var_export($e->errorInfo, true));
+        $noRoleMeeting = true;
+    }
+    foreach ($meeting_role_id as $attendee) {
+        array_push($attending_role_id, $attendee["role_id"]);
+    }
+
     //getting all users
     $db = getDB();
     $stmt = $db->prepare(
@@ -63,6 +86,23 @@ if (isset($_GET["id"])) {
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($results) {
             $users = $results;
+        } else {
+            flash("Couldn't retrieve Users. Code 7.", "danger");
+        }
+    } catch (PDOException $e) {
+        flash("Couldn't retrieve Users. Code 6." . var_export($e->errorInfo, true), "danger");
+    }
+
+    //getting all roles
+    $db = getDB();
+    $stmt = $db->prepare(
+        "SELECT * FROM Roles"
+    );
+    try {
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($results) {
+            $roles = $results;
         } else {
             flash("Couldn't retrieve Users. Code 7.", "danger");
         }
@@ -81,8 +121,9 @@ if (isset($_GET["timestamp"])) {
     }
 }
 
-if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
-    $user_ids = $_POST['checkbox'];
+if (isset($_GET["timestamp"]) && isset($_POST['checkbox_users'])) {
+    $user_ids = $_POST['checkbox_users'];
+    $role_ids = $_POST['checkbox_roles'];
     $datetime = se($_GET, "timestamp", null, false);
     $message = se($_POST, "message", null, false);
     $error = false;
@@ -118,7 +159,7 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
         $delete_id = array_diff($attendees_id, $user_ids);
 
         //add attendees
-       if (!empty($add_id)) {
+        if (!empty($add_id)) {
             $placeholders = implode(',', array_fill(0, count($add_id), "(?, ?)"));
             $params = [];
             foreach ($add_id as $uid) {
@@ -156,6 +197,49 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
                 $success = false;
             }
         }
+
+        $add_id = array_diff($role_ids, $attending_role_id);
+        $delete_id = array_diff($attending_role_id, $role_ids);
+
+        //adding new roles
+        if (!empty($add_id)) {
+            $placeholders = implode(',', array_fill(0, count($add_id), "(?, ?)"));
+            $params = [];
+            foreach ($add_id as $uid) {
+                $params[] = $id;
+                $params[] = $uid;
+            }
+            $stmt = $db->prepare("INSERT INTO meeting_roles (meeting_id, role_id) VALUES $placeholders");
+            try {
+                $stmt->execute($params);
+                $success = true;
+            } catch (PDOException $e) {
+                flash("Error adding roles.", "danger");
+                error_log("Add error: " . var_export($e->errorInfo, true));
+                $success = false;
+            }
+        }
+
+        // Delete roles
+        if (!empty($delete_id)) {
+            $conditions = [];
+            $params = [];
+            foreach ($delete_id as $uid) {
+                $conditions[] = "(meeting_id = ? AND role_id = ?)";
+                $params[] = $id;
+                $params[] = $uid;
+            }
+            $sql = "DELETE FROM meeting_roles WHERE " . implode(" OR ", $conditions);
+            $stmt = $db->prepare($sql);
+            try {
+                $stmt->execute($params);
+                $success = true;
+            } catch (PDOException $e) {
+                flash("Error deleting roles.", "danger");
+                error_log("Delete error: " . var_export($e->errorInfo, true));
+                $success = false;
+            }
+        }
     }
     if ($success) header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $id . "&timestamp=" . $datetime . "&success=" . $success);
 }
@@ -175,6 +259,7 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
     </form>
     <?php if (isset($_GET["timestamp"])): ?>
         <form method="POST" onsubmit="return validate(this);">
+            <h2>List of Users</h2>
             <table class="table table-striped">
                 <thead>
                     <tr>
@@ -191,9 +276,9 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
                     <?php foreach ($users as $user): ?>
                         <th scope="row">
                             <?php if (in_array($user['id'], $attendees_id)): ?>
-                                <input type="checkbox" class="form-check-input" checked name="checkbox[]" value="<?php echo $user["id"]; ?>" id="checkbox">
+                                <input type="checkbox" class="form-check-input" checked name="checkbox_users[]" value="<?php echo $user["id"]; ?>" id="checkbox">
                             <?php else: ?>
-                                <input type="checkbox" class="form-check-input" name="checkbox[]" value="<?php echo $user["id"]; ?>" id="checkbox">
+                                <input type="checkbox" class="form-check-input" name="checkbox_users[]" value="<?php echo $user["id"]; ?>" id="checkbox">
                             <?php endif ?>
                         </th>
                         <td> <?php echo $user['username']; ?></td>
@@ -208,6 +293,36 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
                         <td> <?php echo $user['tz_loc']; ?></td>
                         <td> <?php echo $user['tz_name'] . " (" . $user['tz_abb'] . $user['gmt'] . ")"; ?></td>
                         </tr>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
+            <h2>List of Roles</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($roles as $role): ?>
+                        <?php if ($role['is_active']): ?>
+                            <tr>
+                                <?php if (in_array($role['id'], $attending_role_id)): ?>
+                                    <th scope="row">
+                                        <input type="checkbox" class="form-check-input" checked name="checkbox_roles[]" value="<?php echo $role["id"]; ?>" id="checkbox_roles">
+                                    </th>
+                                <?php else: ?>
+                                    <th scope="row">
+                                        <input type="checkbox" class="form-check-input" name="checkbox_roles[]" value="<?php echo $role["id"]; ?>" id="checkbox_roles">
+                                    </th>
+                                <?php endif ?>
+                                <td> <?php echo $role['name']; ?></td>
+                                <td> <?php echo $role['description']; ?></td>
+                            </tr>
+                        <?php endif ?>
                     <?php endforeach ?>
                 </tbody>
             </table>
@@ -226,7 +341,7 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
 <script>
     function validate(form) {
         let isValid = true;
-        const cb = form.querySelectorAll('input[name="checkbox[]"]');
+        const cb = form.querySelectorAll('input[name="checkbox_users[]"]');
         const checkedCount = Array.from(cb).filter(cb => cb.checked).length;
         if (checkedCount === 0) {
             flash("At least one attendee must be selected.", "danger");

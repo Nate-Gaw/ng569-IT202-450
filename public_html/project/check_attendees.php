@@ -49,6 +49,37 @@ if (isset($_GET["index"])) {
         } catch (PDOException $e) {
             flash("Couldn't find meeting. Code 10." . var_export($e->errorInfo, true), "danger");
         }
+
+        $db2 = getDB();
+        $stmt2 = $db2->prepare(
+            "SELECT * FROM meeting_roles AS mr 
+                JOIN UserRoles AS ur ON mr.role_id = ur.role_id
+                JOIN Roles AS r ON ur.role_id = r.id
+                WHERE mr.meeting_id = :id"
+        );
+        try {
+            $stmt2->execute([":id" => $index]);
+            $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+            if ($results2) {
+                $meeting_role_id = $results2;
+
+                //double check prev for doubling issues
+                $old_role_id = 0;
+                $num = 0;
+                foreach ($meeting_role_id as $role) {
+                    if ($role['role_id'] == $old_role_id) {
+                        unset($meeting_role_id[$num]);
+                    }
+                    $old_role_id = $role['role_id'];
+                    $num++;
+                }
+            } else {
+                array_push($meeting_role_id, "You have no meetings.");
+            }
+        } catch (PDOException $e) {
+            flash("There was an error finding your meetings, please contact an admin for support. Code 1.", "danger");
+            error_log("Error toggling role for user $id" . var_export($e->errorInfo, true));
+        }
     } else {
         if (empty($index)) {
             flash("input cannot be empty", "danger");
@@ -140,6 +171,28 @@ if (isset($_GET["index"])) {
             <?php endforeach ?>
         </tbody>
     </table>
+    <? if (!empty($meeting_role_id)): ?>
+        <h4>Roles Attending:</h4>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($meeting_role_id as $role): ?>
+                    <?php if ($role['is_active']): ?>
+                        <tr>
+                            <td scope="row"> <?php echo $role['name']; ?></td>
+                            <td> <?php echo $role['description']; ?></td>
+                        </tr>
+                    <?php endif ?>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+    <? endif ?>
 <?php endif ?>
 
 <script>
