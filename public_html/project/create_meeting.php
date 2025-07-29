@@ -132,7 +132,11 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
                         ?>
                     </td>
                     <td> <?php echo $user['tz_loc']; ?></td>
-                    <td> <?php echo $user['tz_name'] . " (" . $user['tz_abb'] . $user['gmt'] . ")"; ?></td>
+                    <?php if ($user['gmt'] >= 0): ?>
+                        <td style="width: 200px;" ;><?php echo $user['tz_name'] . " (" . $user['tz_abb'] . "+" . $user['gmt'] . ")"; ?></td>
+                    <?php else: ?>
+                        <td style="width: 200px;"><?php echo $user['tz_name'] . " (" . $user['tz_abb'] .$user['gmt'] . ")"; ?></td>
+                    <?php endif ?>
                     </tr>
                 <?php endforeach ?>
             </tbody>

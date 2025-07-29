@@ -42,7 +42,7 @@ if (!is_logged_in()) {
 
         $db2 = getDB();
         $stmt2 = $db2->prepare(
-            "SELECT *, m.gmt AS mgmt, u.gmt AS ugmt FROM meeting_attendees AS ma 
+            "SELECT *, m.gmt AS mgmt, u.gmt AS ugmt, u.tz_abb AS utz_abb, m.tz_abb AS mtz_abb FROM meeting_attendees AS ma 
                 JOIN Meetings AS m ON ma.meeting_id = m.id
                 JOIN Users AS u ON ma.attendee_id = u.id
                 WHERE ma.attendee_id = :id
@@ -103,9 +103,9 @@ if (!is_logged_in()) {
                 <tr>
                     <th style="width: 5vw;" scope="col"># of Rows</th>
                     <th scope="col">Index</th>
-                    <th scope="col">Creator</th>
+                    <th scope="col">Requestor</th>
                     <th scope="col">Message</th>
-                    <th scope="col">Date & Time</th>
+                    <th scope="col">Local Date & Time</th>
                 </tr>
             </thead>
             <tbody>
@@ -122,10 +122,10 @@ if (!is_logged_in()) {
             <thead>
                 <tr>
                     <th scope="col">Index</th>
-                    <th scope="col">Creator</th>
+                    <th scope="col">Requestor</th>
                     <th scope="col">Message</th>
-                    <th scope="col">Date & Time</th>
-                    <th scope="col">Original Date & Time + GMT</th>
+                    <th scope="col">Local Time</th>
+                    <th scope="col">Requestor's Time</th>
                 </tr>
             </thead>
             <div class="tbodyScroll">
@@ -135,15 +135,15 @@ if (!is_logged_in()) {
                             <td><?php echo $meeting['meeting_id']; ?></td>
                             <td><?php echo $meeting['host']; ?></td>
                             <td><?php echo $meeting['message']; ?></td>
-                            <td>
-                                <?php
-                                echo convertTimezone($meeting['meetingDate'], $meeting['mgmt'], $meeting['ugmt']);
-                                ?>
-                            </td>
-                            <?php if ($meeting['mgmt'] > 0): ?>
-                                <td><?php echo $meeting['meetingDate'] . "+" . $meeting["mgmt"]; ?></td>
+                            <?php if ($meeting['ugmt'] >= 0): ?>
+                                <td style="width: 200px;";><?php echo convertTimezone($meeting['meetingDate'], $meeting['mgmt'], $meeting['ugmt']) . " " . $meeting['utz_abb'] . " (GMT+" . $meeting['ugmt'] . ")"; ?></td>
                             <?php else: ?>
-                                <td><?php echo $meeting['meetingDate'] . $meeting["mgmt"]; ?></td>
+                                <td style="width: 200px;"><?php echo convertTimezone($meeting['meetingDate'], $meeting['mgmt'], $meeting['ugmt']) . " " . $meeting['utz_abb'] . " (GMT" . $meeting['ugmt'] . ")"; ?></td>
+                            <?php endif ?>
+                            <?php if ($meeting['mgmt'] >= 0): ?>
+                                <td style="width: 200px;"><?php echo $meeting['meetingDate'] . " " . $meeting['mtz_abb'] . " (GMT+" . $meeting["mgmt"] . ")"; ?></td>
+                            <?php else: ?>
+                                <td style="width: 200px;"><?php echo $meeting['meetingDate'] . " " . $meeting['mtz_abb'] . " (GMT" . $meeting["mgmt"] . ")"; ?></td>
                             <?php endif ?>
                         </tr>
                     <?php } ?>

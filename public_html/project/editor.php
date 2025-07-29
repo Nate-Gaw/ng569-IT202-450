@@ -101,12 +101,12 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox'])) {
         $formattedTime = date("Y-m-d H:i:s", strtotime($datetime));
         $username = get_username();
 
-        //Creating new meeting
+        //Update new meeting
         $db = getDB();
-        $sql = "UPDATE Meetings SET message = :message, meetingDate = :meetingDate, gmt = :gmt WHERE id = :id;";
+        $sql = "UPDATE Meetings SET message = :message, meetingDate = :meetingDate, gmt = :gmt, tz_abb = :tz_abb WHERE id = :id;";
         $stmt = $db->prepare($sql);
         try {
-            $stmt->execute([":message" => $message, ":meetingDate" => $formattedTime, ":gmt" => $user_gmt, ":id" => $id]);
+            $stmt->execute([":message" => $message, ":meetingDate" => $formattedTime, ":gmt" => $user_gmt, ":id" => $id, ":tz_abb" => get_user_abb()]);
             $success = true;
         } catch (PDOException $e) {
             flash("There was an error updating the meeting, please try again later", "danger");
