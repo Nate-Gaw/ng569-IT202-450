@@ -44,6 +44,7 @@
     color: #fff;
 }
 </style>
+<?PHP $BASE_PATH = '/project'; ?>
 <div class="jumbotron">
     <!-- TODO replace your name -->
     <h1 class="display-4">Welcome to Nathanael's project</h1>

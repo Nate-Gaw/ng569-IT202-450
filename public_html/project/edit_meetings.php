@@ -69,10 +69,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
     <thead>
         <tr>
             <th scope="col">Index</th>
-            <th scope="col">Creator</th>
+            <th scope="col">Requestor</th>
             <th scope="col">Message</th>
-            <th scope="col">Date & Time</th>
-            <th scope="col">Original Date & Time + GMT</th>
+            <th scope="col">Local Time</th>
+            <th scope="col">Requestor's Time</th>
             <th scope="col">EDIT</th>
             <th scope="col">DELETE</th>
         </tr>
@@ -83,12 +83,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
                 <td><?php echo $meeting['id']; ?></td>
                 <td><?php echo $meeting['host']; ?></td>
                 <td><?php echo $meeting['message']; ?></td>
-                <td>
-                    <?php
-                    echo convertTimezone($meeting['meetingDate'], $meeting['gmt'], get_user_gmt());
-                    ?>
-                </td>
-                <td><?php echo $meeting['meetingDate'] . $meeting["gmt"]; ?></td>
+                <?php if (get_user_gmt() >= 0): ?>
+                    <td style="width: 200px;" ;><?php echo convertTimezone($meeting['meetingDate'], $meeting['gmt'], get_user_gmt()) . " " . $meeting['tz_abb'] . " (GMT+" . get_user_gmt() . ")"; ?></td>
+                <?php else: ?>
+                    <td style="width: 200px;"><?php echo convertTimezone($meeting['meetingDate'], $meeting['gmt'], get_user_gmt()) . " " . $meeting['tz_abb'] . " (GMT" . get_user_gmt() . ")"; ?></td>
+                <?php endif ?>
+                <?php if ($meeting['gmt'] >= 0): ?>
+                    <td style="width: 200px;"><?php echo $meeting['meetingDate'] . " " . $meeting['tz_abb'] . " (GMT+" . $meeting["gmt"] . ")"; ?></td>
+                <?php else: ?>
+                    <td style="width: 200px;"><?php echo $meeting['meetingDate'] . " " . $meeting['tz_abb'] . " (GMT" . $meeting["gmt"] . ")"; ?></td>
+                <?php endif ?>
                 <td>
                     <button class="btn btn-warning" onclick="event.stopPropagation(); window.location.href='editor.php?id=<?php echo $meeting['id']; ?>&timestamp=<?php echo $meeting['meetingDate']; ?>'">Edit</button>
                 </td>

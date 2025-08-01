@@ -15,6 +15,7 @@ if (!is_logged_in()) {
         //The filtering works through js since I was tired of having the page reload every dearch, so by using JS I was able to have he table update automatically
         $id = get_user_id();
         $roles = [];
+        $noRoleMeeting = false;
 
         $db = getDB();
         $stmt = $db->prepare(
@@ -32,17 +33,15 @@ if (!is_logged_in()) {
             }
         } catch (PDOException $e) {
             flash("There was an error finding your Roles, please contact an admin for support", "danger");
-            error_log("Error toggling role for user $id" . var_export($e->errorInfo, true));
+            $noRoleMeeting = true;
         }
         ?>
         <?php
         $meeting_id = [];
-        $attendees = [];
-        $noMeet = false;
 
         $db2 = getDB();
         $stmt2 = $db2->prepare(
-            "SELECT *, m.gmt AS mgmt, u.gmt AS ugmt FROM meeting_attendees AS ma 
+            "SELECT *, m.gmt AS mgmt, u.gmt AS ugmt, u.tz_abb AS utz_abb, m.tz_abb AS mtz_abb FROM meeting_attendees AS ma 
                 JOIN Meetings AS m ON ma.meeting_id = m.id
                 JOIN Users AS u ON ma.attendee_id = u.id
                 WHERE ma.attendee_id = :id
@@ -55,11 +54,54 @@ if (!is_logged_in()) {
                 $meeting_id = $results2;
             } else {
                 array_push($meeting_id, "You have no meetings.");
-                $noMeet = true;
+                $noRoleMeeting = true;
             }
         } catch (PDOException $e) {
             flash("There was an error finding your meetings, please contact an admin for support. Code 1.", "danger");
             error_log("Error toggling role for user $id" . var_export($e->errorInfo, true));
+            $noRoleMeeting = true;
+        }
+
+        $meeting_role_id = [];
+
+        $db2 = getDB();
+        $stmt2 = $db2->prepare(
+            "SELECT *, m.gmt AS mgmt, u.gmt AS ugmt, u.tz_abb AS utz_abb, m.tz_abb AS mtz_abb FROM meeting_roles AS mr 
+                JOIN Meetings AS m ON mr.meeting_id = m.id
+                JOIN UserRoles AS ur ON mr.role_id = ur.role_id
+                JOIN Users AS u ON ur.user_id = u.id
+                WHERE u.id = :id
+                ORDER BY m.meetingDate ASC"
+        );
+        try {
+            $stmt2->execute([":id" => $id]);
+            $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+            if ($results2) {
+                $meeting_role_id = $results2;
+            } else {
+                array_push($meeting_role_id, "You have no meetings.");
+                $noRoleMeeting = true;
+            }
+        } catch (PDOException $e) {
+            flash("There was an error finding your meetings, please contact an admin for support. Code 1.", "danger");
+            error_log("Error toggling role for user $id" . var_export($e->errorInfo, true));
+            $noRoleMeeting = true;
+        }
+        if (!$noRoleMeeting) {
+            $meeting_id = array_merge($meeting_id, $meeting_role_id);
+            $date = array_column($meeting_id, 'meetingDate');
+            array_multisort($date, SORT_ASC, $meeting_id);
+
+            //double check prev for doubling issues
+            $old_meeting_id = 0;
+            $index = 0;
+            foreach ($meeting_id AS $meeting) {
+                if ($meeting['meeting_id'] == $old_meeting_id) {
+                    unset($meeting_id[$index]);
+                }
+                $old_meeting_id = $meeting['meeting_id'];
+                $index++;
+            }
         }
         ?>
 
@@ -103,9 +145,9 @@ if (!is_logged_in()) {
                 <tr>
                     <th style="width: 5vw;" scope="col"># of Rows</th>
                     <th scope="col">Index</th>
-                    <th scope="col">Creator</th>
+                    <th scope="col">Requestor</th>
                     <th scope="col">Message</th>
-                    <th scope="col">Date & Time</th>
+                    <th scope="col">Local Date & Time</th>
                 </tr>
             </thead>
             <tbody>
@@ -122,10 +164,10 @@ if (!is_logged_in()) {
             <thead>
                 <tr>
                     <th scope="col">Index</th>
-                    <th scope="col">Creator</th>
+                    <th scope="col">Requestor</th>
                     <th scope="col">Message</th>
-                    <th scope="col">Date & Time</th>
-                    <th scope="col">Original Date & Time + GMT</th>
+                    <th scope="col">Local Time</th>
+                    <th scope="col">Requestor's Time</th>
                 </tr>
             </thead>
             <div class="tbodyScroll">
@@ -135,15 +177,15 @@ if (!is_logged_in()) {
                             <td><?php echo $meeting['meeting_id']; ?></td>
                             <td><?php echo $meeting['host']; ?></td>
                             <td><?php echo $meeting['message']; ?></td>
-                            <td>
-                                <?php
-                                echo convertTimezone($meeting['meetingDate'], $meeting['mgmt'], $meeting['ugmt']);
-                                ?>
-                            </td>
-                            <?php if ($meeting['mgmt'] > 0): ?>
-                                <td><?php echo $meeting['meetingDate'] . "+" . $meeting["mgmt"]; ?></td>
+                            <?php if ($meeting['ugmt'] >= 0): ?>
+                                <td style="width: 200px;" ;><?php echo convertTimezone($meeting['meetingDate'], $meeting['mgmt'], $meeting['ugmt']) . " " . $meeting['utz_abb'] . " (GMT+" . $meeting['ugmt'] . ")"; ?></td>
                             <?php else: ?>
-                                <td><?php echo $meeting['meetingDate'] . $meeting["mgmt"]; ?></td>
+                                <td style="width: 200px;"><?php echo convertTimezone($meeting['meetingDate'], $meeting['mgmt'], $meeting['ugmt']) . " " . $meeting['utz_abb'] . " (GMT" . $meeting['ugmt'] . ")"; ?></td>
+                            <?php endif ?>
+                            <?php if ($meeting['mgmt'] >= 0): ?>
+                                <td style="width: 200px;"><?php echo $meeting['meetingDate'] . " " . $meeting['mtz_abb'] . " (GMT+" . $meeting["mgmt"] . ")"; ?></td>
+                            <?php else: ?>
+                                <td style="width: 200px;"><?php echo $meeting['meetingDate'] . " " . $meeting['mtz_abb'] . " (GMT" . $meeting["mgmt"] . ")"; ?></td>
                             <?php endif ?>
                         </tr>
                     <?php } ?>

@@ -1,0 +1,1 @@
+ALTER TABLE Meetings ADD COLUMN tz_abb VARCHAR(7) ;
