@@ -1,10 +1,8 @@
 <?php
 require(__DIR__ . "/../../partials/nav.php");
 
-if (!is_logged_in()) {
-    die(header("Location: login.php"));
-}
 $ma = [];
+$is_public = false;
 
 if (isset($_GET["index"])) {
     $index = $_GET["index"];
@@ -35,7 +33,7 @@ if (isset($_GET["index"])) {
     if (!empty($index) && $verify) {
         $db = getDB();
         $stmt = $db->prepare(
-            "SELECT ma.meeting_id, u.username, u.email, u.tz_loc, m.host, m.message, m.meetingDate, m.gmt FROM meeting_attendees AS ma
+            "SELECT ma.meeting_id, u.username, u.email, u.tz_loc, m.tz_abb, m.host, m.message, m.meetingDate, m.gmt FROM meeting_attendees AS ma
         JOIN Users AS u ON ma.attendee_id = u.id 
         JOIN Meetings AS m ON ma.meeting_id = m.id
         WHERE ma.meeting_id = :index"
@@ -50,6 +48,38 @@ if (isset($_GET["index"])) {
             }
         } catch (PDOException $e) {
             flash("Couldn't find meeting. Code 10." . var_export($e->errorInfo, true), "danger");
+        }
+
+        $db2 = getDB();
+        $stmt2 = $db2->prepare(
+            "SELECT * FROM meeting_roles AS mr 
+                JOIN UserRoles AS ur ON mr.role_id = ur.role_id
+                JOIN Roles AS r ON ur.role_id = r.id
+                WHERE mr.meeting_id = :id"
+        );
+        $meeting_role_id = [];
+        try {
+            $stmt2->execute([":id" => $index]);
+            $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+            if ($results2) {
+                $meeting_role_id = $results2;
+
+                //double check prev for doubling issues
+                $old_role_id = 0;
+                $num = 0;
+                foreach ($meeting_role_id as $role) {
+                    if ($role['role_id'] == $old_role_id) {
+                        unset($meeting_role_id[$num]);
+                    }
+                    $old_role_id = $role['role_id'];
+                    $num++;
+                }
+            } else {
+                array_push($meeting_role_id, ["is_active" => "1", "name" => "No Roles attending this meeting", "description" => ""]);
+            }
+        } catch (PDOException $e) {
+            flash("There was an error finding your meetings, please contact an admin for support. Code 1.", "danger");
+            error_log("Error toggling role for user $id" . var_export($e->errorInfo, true));
         }
     } else {
         if (empty($index)) {
@@ -76,14 +106,23 @@ if (isset($_GET["index"])) {
     </div>
 </form>
 <?php if (!empty($ma)): ?>
+    <?php foreach ($ma as $attendee): ?>
+        <?php if ($attendee['username'] == 'PUBLIC') {
+            $is_public = true;
+        } ?>
+    <?php endforeach ?>
     <table class="table table-hover">
         <thead>
             <tr>
                 <th scope="col">Meeting ID</th>
                 <th scope="col">Creator</th>
                 <th scope="col">Message</th>
-                <th scope="col">Date & Time</th>
-                <th scope="col">Original Date & Time + GMT</th>
+                <?php if (!$is_public): ?>
+                    <th scope="col">Local Time</th>
+                    <th scope="col">Requestor's Time</th>
+                <?php else: ?>
+                    <th scope="col">GMT Time</th>
+                <?php endif ?>
             </tr>
         </thead>
         <div class="tbodyScroll">
@@ -92,12 +131,20 @@ if (isset($_GET["index"])) {
                     <th scope="row"><?php echo $ma[0]['meeting_id']; ?></th>
                     <td><?php echo $ma[0]['host']; ?></td>
                     <td><?php echo $ma[0]['message']; ?></td>
-                    <td>
-                        <?php
-                        echo convertTimezone($ma[0]['meetingDate'], $ma[0]['gmt'], get_user_gmt());
-                        ?>
-                    </td>
-                    <td><?php echo $ma[0]['meetingDate'] . $ma[0]["gmt"]; ?></td>
+                    <?php if (!$is_public): ?>
+                        <?php if (get_user_gmt() >= 0): ?>
+                            <td style="width: 200px;" ;><?php echo convertTimezone($ma[0]['meetingDate'], $ma[0]['gmt'], get_user_gmt()) . " " . get_user_abb() . " (GMT+" . get_user_gmt() . ")"; ?></td>
+                        <?php else: ?>
+                            <td style="width: 200px;"><?php echo convertTimezone($ma[0]['meetingDate'], $ma[0]['gmt'], get_user_gmt()) . " " . get_user_abb() . " (GMT" . get_user_gmt() . ")"; ?></td>
+                        <?php endif ?>
+                        <?php if ($ma[0]['gmt'] >= 0): ?>
+                            <td style="width: 200px;"><?php echo $ma[0]['meetingDate'] . " " . $ma[0]['tz_abb'] . " (GMT+" . $ma[0]["gmt"] . ")"; ?></td>
+                        <?php else: ?>
+                            <td style="width: 200px;"><?php echo $ma[0]['meetingDate'] . " " . $ma[0]['tz_abb'] . " (GMT" . $ma[0]["gmt"] . ")"; ?></td>
+                        <?php endif ?>
+                    <?php else: ?>
+                        <td style="width: 200px;"><?php echo $ma[0]['meetingDate'] . " GMT (GMT+0)"; ?></td>
+                    <?php endif ?>
                 </tr>
             </tbody>
         </div>
@@ -113,6 +160,10 @@ if (isset($_GET["index"])) {
         </thead>
         <tbody>
             <?php foreach ($ma as $attendee): ?>
+                <?php if ($attendee['username'] == 'PUBLIC') {
+                    $is_public = true;
+                } ?>
+
                 <tr>
                     <th scope="row"><?php echo $attendee['username'] ?></th>
                     <td><?php echo $attendee['email'] ?></td>
@@ -121,13 +172,35 @@ if (isset($_GET["index"])) {
             <?php endforeach ?>
         </tbody>
     </table>
+    <? if (!empty($meeting_role_id)): ?>
+        <h4>Roles Attending:</h4>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($meeting_role_id as $role): ?>
+                    <?php if ($role['is_active']): ?>
+                        <tr>
+                            <td scope="row"> <?php echo $role['name']; ?></td>
+                            <td> <?php echo $role['description']; ?></td>
+                        </tr>
+                    <?php endif ?>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+    <? endif ?>
 <?php endif ?>
 
 <script>
     function validate(form) {
         index = form.index.value;
         isValid = true;
-        if (empty(index)) { 
+        if (empty(index)) {
             flash("input cannot be empty", "danger");
             isValid = false;
         }

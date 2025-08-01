@@ -54,6 +54,9 @@ session_start();
                     <li class="nav-item">
                         <a class="nav-link" aria-current="page" href="<?php echo get_url('register.php'); ?>">Register</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="<?php echo get_url('public_meetings.php'); ?>">Check Public Meetings</a>
+                    </li>
                 <?php endif; ?>
                 <?php if (has_role("Admin")) : ?>
                     <li class="nav-item dropdown">
@@ -82,11 +85,11 @@ session_start();
                             </li>
                             <li><a class="dropdown-item" aria-current="page" href="<?php echo get_url('edit_meetings.php'); ?>">Edit Your Meetings</a>
                             </li>
-                            <li><a class="dropdown-item" aria-current="page" href="<?php echo get_url('check_attendees.php'); ?>">Check Meeting Details</a>
+                            <li><a class="dropdown-item" aria-current="page" href="<?php echo get_url('check_attendees.php'); ?>">Meeting Details</a>
                             </li>
                             <?php if (has_role("Admin")) : ?>
                                 <li class="nav-item">
-                                    <a class="dropdown-item" aria-current="page" href="<?php echo get_url('admin/manage_meetings.php'); ?>">Manage All Meetings</a>
+                                    <a class="dropdown-item" aria-current="page" href="<?php echo get_url('admin/manage_meetings.php'); ?>">All Meetings</a>
                                 </li>
                             <?php endif; ?>
                         </ul>

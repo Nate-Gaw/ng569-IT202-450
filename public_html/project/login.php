@@ -18,45 +18,6 @@ $form = [
     ]
 ];
 ?>
-<div class="container-fluid">
-    <h3>Login</h3>
-    <form onsubmit="return validate(this)" method="POST">
-        <?php foreach ($form as $field): ?>
-            <?php render_input($field); ?>
-        <?php endforeach; ?>
-        <?php render_button(["text" => "Login", "type" => "submit"]); ?>
-    </form>
-    <script>
-        function validate(form) {
-            //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
-            //ensure it returns false for an error and true for success
-
-            //ng569 7/7/25
-            //JS Validation, checks for empty email and password then checks if the password is valid, 
-            // then checks the first input to see if its a valid email or a valid username
-            let isValid = true;
-            let pw = form.password.value;
-            let email = form.email.value;
-            if (empty(email)) {
-                flash("Email/Username must not be empty.", "danger");
-                isValid = true;
-            }
-            if (empty(pw)) {
-                flash("Password must not be empty.", "danger");
-                isValid = true;
-            }
-            if (!isValidPassword(pw)) {
-                flash("Password must be at least 8 characters", "warning");
-                isValid = false;
-            }
-            if (!isValidEmail(email) && !isValidUsername(email)) {
-                flash("Invalid email or username.", "danger");
-                isValid = false;
-            }
-            return isValid;
-        }
-    </script>
-</div>
 
 <?php
 //TODO 2: add PHP Code
@@ -163,6 +124,45 @@ if (isset($_POST["email"], $_POST["password"])) {
 }
 ?>
 
+<div class="container-fluid">
+    <h3>Login</h3>
+    <form onsubmit="return validate(this)" method="POST">
+        <?php foreach ($form as $field): ?>
+            <?php render_input($field); ?>
+        <?php endforeach; ?>
+        <?php render_button(["text" => "Login", "type" => "submit"]); ?>
+    </form>
+    <script>
+        function validate(form) {
+            //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
+            //ensure it returns false for an error and true for success
+
+            //ng569 7/7/25
+            //JS Validation, checks for empty email and password then checks if the password is valid, 
+            // then checks the first input to see if its a valid email or a valid username
+            let isValid = true;
+            let pw = form.password.value;
+            let email = form.email.value;
+            if (empty(email)) {
+                flash("Email/Username must not be empty.", "danger");
+                isValid = true;
+            }
+            if (empty(pw)) {
+                flash("Password must not be empty.", "danger");
+                isValid = true;
+            }
+            if (!isValidPassword(pw)) {
+                flash("Password must be at least 8 characters", "warning");
+                isValid = false;
+            }
+            if (!isValidEmail(email) && !isValidUsername(email)) {
+                flash("Invalid email or username.", "danger");
+                isValid = false;
+            }
+            return isValid;
+        }
+    </script>
+</div>
 <?php
 require(__DIR__ . "/../../partials/flash.php");
 ?>
