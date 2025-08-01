@@ -57,6 +57,7 @@ if (isset($_GET["index"])) {
                 JOIN Roles AS r ON ur.role_id = r.id
                 WHERE mr.meeting_id = :id"
         );
+        $meeting_role_id = [];
         try {
             $stmt2->execute([":id" => $index]);
             $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
@@ -74,7 +75,7 @@ if (isset($_GET["index"])) {
                     $num++;
                 }
             } else {
-                array_push($meeting_role_id, "You have no meetings.");
+                array_push($meeting_role_id, ["is_active" => "1", "name" => "No Roles attending this meeting", "description" => ""]);
             }
         } catch (PDOException $e) {
             flash("There was an error finding your meetings, please contact an admin for support. Code 1.", "danger");
