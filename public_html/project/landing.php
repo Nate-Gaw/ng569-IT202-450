@@ -7,6 +7,25 @@ if (!is_logged_in()) {
 }
 ?>
 
+<style>
+    .home_page {
+        border: #212529 solid 2px;
+        padding: 10px;
+        background-color: bisque;
+        width:20vw;
+        text-align: center;
+        margin-left:38vw;
+    }
+
+    body {
+        background-image: url('imgs/rocks.jpg');
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center center;
+    }
+</style>
+
 <div id="landing-body">
     <?php if (is_logged_in()): ?>
         <?php
@@ -95,7 +114,7 @@ if (!is_logged_in()) {
             //double check prev for doubling issues
             $old_meeting_id = 0;
             $index = 0;
-            foreach ($meeting_id AS $meeting) {
+            foreach ($meeting_id as $meeting) {
                 if ($meeting['meeting_id'] == $old_meeting_id) {
                     unset($meeting_id[$index]);
                 }
@@ -105,9 +124,11 @@ if (!is_logged_in()) {
         }
         ?>
 
-        <h1 style="text-align: center;">Home Page</h1>
-        <p style="text-align: center;">Welcome, <?php echo get_username() ?>!</p>
-        <p style="text-align: center;">Your current location is: <?php echo get_user_loc() ?></p>
+        <div class="home_page">
+            <h1 style="color:darkmagenta;">Home Page</h1>
+            <p>Welcome, <?php echo get_username() ?>!</p>
+            <p>Your current location is: <?php echo get_user_loc() ?></p>
+        </div>
         <h2> Your Roles: </h2>
         <ul class="list-group" style="width: 10vw;">
             <?php if (!empty($roles)): ?>
