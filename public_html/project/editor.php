@@ -33,10 +33,9 @@ if (isset($_GET["id"])) {
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($results) {
             $info = $results;
-            if ($info[0]["host"] != get_username() && !has_role("admin")) {
+            if ($info[0]["host"] != get_username() && !has_role("Admin")) {
                 $access = false;
                 flash("You do not have access to modify this meeting Code 13", "danger");
-                error_log("Error getting meeting" . var_export($e->errorInfo, true));
             }
         } else {
             flash("This meeting doesn't exist or you do not have access to this meeting, please contact an admin for support Code 14", "danger");
@@ -63,8 +62,10 @@ if (isset($_GET["id"])) {
         $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
         if ($results2) {
             $meeting_role_id = $results2;
+            foreach ($meeting_role_id as $attendee) {
+                array_push($attending_role_id, $attendee["role_id"]);
+            }
         } else {
-            array_push($meeting_role_id, "You have no meetings.");
             $noRoleMeeting = true;
         }
     } catch (PDOException $e) {
@@ -72,9 +73,7 @@ if (isset($_GET["id"])) {
         error_log("Error toggling role for user $id" . var_export($e->errorInfo, true));
         $noRoleMeeting = true;
     }
-    foreach ($meeting_role_id as $attendee) {
-        array_push($attending_role_id, $attendee["role_id"]);
-    }
+
 
     //getting all users
     $db = getDB();
@@ -247,7 +246,7 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox_users'])) {
 ?>
 
 <?php if ($access): ?>
-    <p style="margin: 10px;">Meeting date and time is based on your current location of <?php echo get_user_loc() . get_user_gmt() ?></p>
+    <p style="margin: 10px;">Meeting date and time is based on your current location of <?php echo get_user_loc() ?></p>
     <p style="text-align: center; color:Yellow; margin:0px;">Please enter date and time and click "Update Table" to update the table times below</p>
     <form method="GET">
         <input type="hidden" name="id" value="<?php echo $id; ?>">

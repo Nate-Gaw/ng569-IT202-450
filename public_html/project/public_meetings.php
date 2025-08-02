@@ -25,7 +25,7 @@ try {
 ?>
 
 <br>
-<h1 style="text-align: center;">Manage Your Meetings</h1>
+<h1 style="text-align: center;">Public Meetings</h1>
 <br>
 <h2 style="text-align: center;">Search:</h2>
 
