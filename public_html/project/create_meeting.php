@@ -130,7 +130,7 @@ if (isset($_GET["timestamp"]) && isset($_POST['checkbox_users'])) {
 ?>
 
 <h1>Create a Meeting</h1>
-<p>Meeting date and time is based on your current location of <?php echo get_user_loc() . get_user_gmt() ?></p>
+<p>Meeting date and time is based on your current location of <?php echo get_user_loc()?></p>
 <p style="text-align: center; color:Yellow; margin:0px;">Please enter date and time and click "Update Table"</p>
 <form method="GET">
     <div class="mb-3">
