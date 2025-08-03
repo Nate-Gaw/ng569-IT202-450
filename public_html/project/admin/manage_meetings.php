@@ -6,6 +6,9 @@ if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
     die(header("Location: " . get_url("landing.php")));
 }
+if(isset($_GET['success'])) {
+    flash("Successfully deleted meeting!", "success");
+}
 
 $meetings = [];
 
@@ -36,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
         flash("There was an error deleting meetings, please contact an admin for support Code 6", "danger");
         error_log("Error deleting meetings" . var_export($e->errorInfo, true));
     }
-    header("Location: " . $_SERVER['PHP_SELF']); //reload page
+    header("Location: " . $_SERVER['PHP_SELF'] . "?success=true"); //reload page
 }
 ?>
 
