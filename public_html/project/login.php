@@ -1,22 +1,5 @@
 <?php
 require(__DIR__ . "/../../partials/nav.php");
-$form = [
-    [
-        "type" => "text",
-        "id" => "email",
-        "name" => "email",
-        "label" => "Email/Username",
-        "value" => se($_POST, "email", "", false),
-        "rules" => ["required" => true]
-    ],
-    [
-        "type" => "password",
-        "id" => "pw",
-        "name" => "password",
-        "label" => "Password",
-        "rules" => ["required" => true, "minlength" => 8]
-    ]
-];
 ?>
 
 <?php
@@ -124,13 +107,43 @@ if (isset($_POST["email"], $_POST["password"])) {
 }
 ?>
 
+<style>
+    body {
+        background-image: url('imgs/sky.jpg');
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+    }
+</style>
+
 <div class="container-fluid">
-    <h3>Login</h3>
+    <br>
+    <h3>Log In To ng569 IT202 Project</h3>
+    <br>
     <form onsubmit="return validate(this)" method="POST">
-        <?php foreach ($form as $field): ?>
-            <?php render_input($field); ?>
-        <?php endforeach; ?>
-        <?php render_button(["text" => "Login", "type" => "submit"]); ?>
+        <div>
+            <label for="email" class="login">Email/Username:</label>
+            <input
+                type="text"
+                id="email"
+                name="email"
+                class="log-in"
+                value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
+                required>
+        </div>
+
+        <div>
+            <label for="pw" class="login">Password:</label>
+            <input
+                type="password"
+                id="pw"
+                name="password"
+                class="log-in"
+                required
+                minlength="8">
+        </div>
+        <?php render_button(["text" => "Log In", "type" => "submit"]); ?>
     </form>
     <script>
         function validate(form) {
