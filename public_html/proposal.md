@@ -1,7 +1,7 @@
 ## Project Name: API Project
 ### Project Summary: This project will primarily use data pull from an API to do something project-specific.
 ### Github Link: https://github.com/Nate-Gaw/ng569-IT202-450/tree/prod/public_html/project
-### Website Link: https://ng569-it202-450-prod-3272507b1c51.herokuapp.com/project/login.php
+### Website Link: https://ng569-it202-450-prod-3272507b1c51.herokuapp.com/project/
 ### API Link: https://rapidapi.com/BasedAPI/api/world-time-by-based-api
 ### Your Name: Nathanael Gaw
 ### Course/Section: IT 202-450
